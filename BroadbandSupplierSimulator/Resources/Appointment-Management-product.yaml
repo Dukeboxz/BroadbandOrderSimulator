@@ -1,0 +1,2078 @@
+openapi: 3.0.0
+info:
+  title: Appointment Management
+  description: List available engineering appointments and reserve an engineering visit.
+  version: '0.3'
+servers:
+  - url: https://api.wholesale.bt.com
+    description: Production
+  - url: https://api-sandbox.wholesale.bt.com
+    description: Sandbox
+paths:
+  /common/appointmentManagement/v4/searchTimeSlot:
+    post:
+      summary: Appointment availability
+      operationId: postSearchAppointment
+      description: "<p>Find available engineer appointment slots based on a location, product, type of work and 1st available date.</p>\n\t\n<p>This API supports TLS mutual authentication.</p>\n\n <details>\n <summary><b>Sandbox responses</b></summary>\n\n <p>The sandbox supports a number of success and failure scenarios. Use the parameters below in the sandbox API call to generate the corresponding responses.</p>\n <p>Success scenarios responses are simulated based on the parameters mentioned in the table.</p>\n\n <p>Back-end error scenarios responses are simulated based on APIGW-Tracking-Header.</p>\n\n <details>\n <summary><b>Success scenarios</b></summary> \n\n | Parameters| Sandbox response invoked | Description |\n | ----------- | ------------------- | ------------------ |\n | <i>name</i>='DirectoryNumber', <i>value</i>='2277264355'.| 201 | Retrieve product appointments based on 'DirectoryNumber'. |\n | <i>id</i>='R0123457890'. | 201 | Retrieve product appointments based on product place ID. |\n\n\n </details>\n\n <details>\n <summary><b>Error scenarios</b></summary>    \n\n | APIGW-Tracking-Header | Sandbox response invoked | Description |\n | ----------- | ------------ | ------------ | \n | E40001 | 400, TimeSlotNotSupported | The product does not support appointments in that slot. |\n | E40301 | 403, ExchangeLineAssignedToAnotherCP | The exchange line is in use by another communication provider. |\n\n\n </details>\n </details>"
+      x-codeSamples:
+        - lang: Shell
+          label: cURL
+          source: >
+            curl -XPOST
+
+            -H "APIGW-Tracking-Header: 96bb97fa-b941-46bb-8c4e-86c616c28a13"
+
+            -H "Authorization: Bearer SZrYQsmi9tvGj1XwmKr5lXD4dpXY" 
+
+            -H "productFamily: ethernet"
+
+            -H "Content-Type: application/json"
+
+            https://api-sandbox.wholesale.bt.com/common/appointmentManagement/v4/searchTimeSlot
+
+            {
+              "relatedEntity": [{
+                "appointmentType": "Standard",
+                "siteVisitReason": "Standard",
+                "product": {
+                  "productSpecification": {
+                    "id": "Etherway Superfast GEA"
+                  },
+                  "characteristic": [{
+                    "name": "DirectoryNumber",
+                    "value": "2277264355"
+                  }, {
+                    "name": "AccessTechnology",
+                    "value": "Generic Ethernet Access"
+                  }]
+                },
+                "id": "1",
+                "role": "OrderInformation",
+                "@referredType": "BTProductAppointmentSpecification",
+                "@type": "BTProductAppointmentSpecification",
+                "@baseType": "RelatedEntity"
+              }],
+              "requestedTimeSlot": [{
+                "validFor": {
+                  "startDateTime": "2022-12-17T09:00:00.000Z"
+                }
+              }]
+            }
+      security:
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/APIGWTrackingHeader'
+        - $ref: '#/components/parameters/BearerAuthorisation'
+        - $ref: '#/components/parameters/productFamily'
+        - $ref: '#/components/parameters/JSONContentType'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postSearchAppointmentRequest'
+            examples:
+              For ethernet directory number:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        characteristic:
+                          - name: DirectoryNumber
+                            value: '02277268049'
+                          - name: AccessTechnology
+                            value: Generic Ethernet Access
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  requestedTimeSlot:
+                    - validFor:
+                        startDateTime: '2022-03-17T09:00:00.000Z'
+              For ethernet address key:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        place:
+                          - id: A01234578901
+                            role: InstallationAddress
+                            '@referredType': OpenreachAddress
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  requestedTimeSlot:
+                    - validFor:
+                        startDateTime: '2022-03-17T09:00:00.000Z'
+              For BB1 directory number:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        characteristic:
+                          - name: AccessTechnology
+                            value: FTTC
+                          - name: DirectoryNumber
+                            value: '02890830541'
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  requestedTimeSlot:
+                    - validFor:
+                        startDateTime: '2022-11-22T09:00:00Z'
+              For BB1 address key:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        characteristic:
+                          - name: AccessTechnology
+                            value: FTTP
+                        place:
+                          - id: A15104646632
+                            role: InstallationAddress
+                            '@referredType': OpenreachAddress
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  requestedTimeSlot:
+                    - validFor:
+                        startDateTime: '2022-11-22T09:00:00Z'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postSearchAppointmentResponse'
+              examples:
+                For ethernet directory number:
+                  value:
+                    id: '1234567812'
+                    status: done
+                    searchDate: '2022-03-07T14:56:21.000Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: Etherway Superfast GEA
+                          characteristic:
+                            - name: DirectoryNumber
+                              value: xxxxx
+                            - name: AccessTechnology
+                              value: Generic Ethernet Access
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    requestedTimeSlot:
+                      - validFor:
+                          startDateTime: '2022-03-17T09:00:00.000Z'
+                    availableTimeSlot:
+                      - slot: '0900'
+                        validFor:
+                          startDateTime: '2022-03-17T09:00:00.000Z'
+                          endDateTime: '2022-03-17T11:00:00.000Z '
+                      - slot: '1100'
+                        validFor:
+                          startDateTime: '2022-03-17T11:00:00.000Z'
+                          endDateTime: '2022-03-17T13:00:00.000Z '
+                For ethernet address key:
+                  value:
+                    id: '1234567812'
+                    status: done
+                    searchDate: '2022-03-07T14:56:21.000Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: Etherway Superfast GEA
+                          place:
+                            - id: R0123457890
+                              role: InstallationAddress
+                              '@referredType': OpenreachAddress
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    requestedTimeSlot:
+                      - validFor:
+                          startDateTime: '2022-03-17T09:00:00.000Z'
+                    availableTimeSlot:
+                      - slot: '0900'
+                        validFor:
+                          startDateTime: '2022-03-17T09:00:00.000Z'
+                          endDateTime: '2022-03-17T11:00:00.000Z '
+                      - slot: '1100'
+                        validFor:
+                          startDateTime: '2022-03-17T11:00:00.000Z'
+                          endDateTime: '2022-03-17T13:00:00.000Z '
+                For BB1 directory number:
+                  value:
+                    id: 21147d79-577b-488a-af57-f80ea5dfb876
+                    status: done
+                    searchDate: '2022-11-09T07:06:39Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: BB1
+                          characteristic:
+                            - name: AccessTechnology
+                              value: FTTC
+                            - name: DirectoryNumber
+                              value: '02890830541'
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    requestedTimeSlot:
+                      - validFor:
+                          startDateTime: '2022-11-22T09:00:00Z'
+                    availableTimeSlot:
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-11-29T08:00:00Z'
+                          endDateTime: '2022-11-29T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-11-29T13:00:00Z'
+                          endDateTime: '2022-11-29T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-11-30T08:00:00Z'
+                          endDateTime: '2022-11-30T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-11-30T13:00:00Z'
+                          endDateTime: '2022-11-30T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-01T08:00:00Z'
+                          endDateTime: '2022-12-01T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-01T13:00:00Z'
+                          endDateTime: '2022-12-01T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-02T08:00:00Z'
+                          endDateTime: '2022-12-02T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-02T13:00:00Z'
+                          endDateTime: '2022-12-02T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-05T08:00:00Z'
+                          endDateTime: '2022-12-05T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-05T13:00:00Z'
+                          endDateTime: '2022-12-05T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-06T08:00:00Z'
+                          endDateTime: '2022-12-06T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-06T13:00:00Z'
+                          endDateTime: '2022-12-06T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-07T08:00:00Z'
+                          endDateTime: '2022-12-07T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-07T13:00:00Z'
+                          endDateTime: '2022-12-07T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-08T08:00:00Z'
+                          endDateTime: '2022-12-08T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-08T13:00:00Z'
+                          endDateTime: '2022-12-08T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-09T08:00:00Z'
+                          endDateTime: '2022-12-09T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-09T13:00:00Z'
+                          endDateTime: '2022-12-09T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-12T08:00:00Z'
+                          endDateTime: '2022-12-12T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-12T13:00:00Z'
+                          endDateTime: '2022-12-12T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-13T08:00:00Z'
+                          endDateTime: '2022-12-13T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-13T13:00:00Z'
+                          endDateTime: '2022-12-13T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-14T08:00:00Z'
+                          endDateTime: '2022-12-14T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-14T13:00:00Z'
+                          endDateTime: '2022-12-14T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-15T08:00:00Z'
+                          endDateTime: '2022-12-15T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-15T13:00:00Z'
+                          endDateTime: '2022-12-15T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-16T08:00:00Z'
+                          endDateTime: '2022-12-16T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-16T13:00:00Z'
+                          endDateTime: '2022-12-16T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-19T08:00:00Z'
+                          endDateTime: '2022-12-19T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-19T13:00:00Z'
+                          endDateTime: '2022-12-19T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-20T08:00:00Z'
+                          endDateTime: '2022-12-20T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-20T13:00:00Z'
+                          endDateTime: '2022-12-20T18:00:00Z'
+                For BB1 addresskey:
+                  value:
+                    id: 21147d79-577b-488a-af57-f80ea5dfb876
+                    status: done
+                    searchDate: '2022-11-09T07:06:39Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: BB1
+                          characteristic:
+                            - name: AccessTechnology
+                              value: FTTP
+                          place:
+                            - id: A15104646632
+                              role: InstallationAddress
+                              '@referredType': OpenreachAddress
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    requestedTimeSlot:
+                      - validFor:
+                          startDateTime: '2022-11-22T09:00:00Z'
+                    availableTimeSlot:
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-11-29T08:00:00Z'
+                          endDateTime: '2022-11-29T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-11-29T13:00:00Z'
+                          endDateTime: '2022-11-29T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-11-30T08:00:00Z'
+                          endDateTime: '2022-11-30T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-11-30T13:00:00Z'
+                          endDateTime: '2022-11-30T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-01T08:00:00Z'
+                          endDateTime: '2022-12-01T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-01T13:00:00Z'
+                          endDateTime: '2022-12-01T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-02T08:00:00Z'
+                          endDateTime: '2022-12-02T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-02T13:00:00Z'
+                          endDateTime: '2022-12-02T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-05T08:00:00Z'
+                          endDateTime: '2022-12-05T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-05T13:00:00Z'
+                          endDateTime: '2022-12-05T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-06T08:00:00Z'
+                          endDateTime: '2022-12-06T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-06T13:00:00Z'
+                          endDateTime: '2022-12-06T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-07T08:00:00Z'
+                          endDateTime: '2022-12-07T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-07T13:00:00Z'
+                          endDateTime: '2022-12-07T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-08T08:00:00Z'
+                          endDateTime: '2022-12-08T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-08T13:00:00Z'
+                          endDateTime: '2022-12-08T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-09T08:00:00Z'
+                          endDateTime: '2022-12-09T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-09T13:00:00Z'
+                          endDateTime: '2022-12-09T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-12T08:00:00Z'
+                          endDateTime: '2022-12-12T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-12T13:00:00Z'
+                          endDateTime: '2022-12-12T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-13T08:00:00Z'
+                          endDateTime: '2022-12-13T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-13T13:00:00Z'
+                          endDateTime: '2022-12-13T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-14T08:00:00Z'
+                          endDateTime: '2022-12-14T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-14T13:00:00Z'
+                          endDateTime: '2022-12-14T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-15T08:00:00Z'
+                          endDateTime: '2022-12-15T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-15T13:00:00Z'
+                          endDateTime: '2022-12-15T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-16T08:00:00Z'
+                          endDateTime: '2022-12-16T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-16T13:00:00Z'
+                          endDateTime: '2022-12-16T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-19T08:00:00Z'
+                          endDateTime: '2022-12-19T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-19T13:00:00Z'
+                          endDateTime: '2022-12-19T18:00:00Z'
+                      - slot: AM
+                        validFor:
+                          startDateTime: '2022-12-20T08:00:00Z'
+                          endDateTime: '2022-12-20T13:00:00Z'
+                      - slot: PM
+                        validFor:
+                          startDateTime: '2022-12-20T13:00:00Z'
+                          endDateTime: '2022-12-20T18:00:00Z'
+        '400':
+          description: "Bad Request\n    \n| Code | Message  | Description |\n| ---- | -------   | ----------- |\n| 21 | Missing body | This resource requires a body to be provided in the request.|\n| 22 | Invalid body | The posted body is not well-formed and thus cannot be parsed. |\n| 23 | Missing body field | Some required body fields are missing. |\n| 25 | Missing header: \\<parameter\\>| The indicated parameter is missing from the request header. |\n| 26 | Invalid header value: \\<parameter\\> | The indicated parameter in the request header is not recognized. |\n| SiteVisitReasonNotSuported | - |  The error originated from target, when passed <i>siteVisitReason</i> not allowed for the specified product. | \n| SimNotSupported | - | The error originated from target, when invalid <i>productCode & simProvide</i> flag combination. |\n| MissingLocationIdentifier | - | The error originated from target, when neither <i>DirectoryNumber</i> nor address supplied.|\n| TooManyLocationIdentifiers | - |  The error originated from target, when both <i>DirectoryNumber</i> and address supplied. | \n| TimeSlotNotSupported | - | The error originated from target, when data is valid but we don't support (e.g. ALLDAY) slot for G.Fast.|\n| AccessLineIdNotRecognised | - | The error originated from target, when  data could not be returned as the access line ID was not recognised.\t|\n| NewExchangeLineNotSupported | - |  The error originated from target, when <i>NewExchangeLine</i> included in appointment request for 'non-SOGEA/SOGFASTline'. | \n| NoDirectoryNumberForAccessLineId\t | - | The error originated from target, when no installation directory number exists for the given access line ID.|\n| InvalidInputCombination | - | The error originated from target, when the location identifier, sim flag and product combination is not supported.|\n| TimeSlotNotAvailable | - |  The error originated from target, when MAC2 2131 the appointment slot you are trying to reserve is no longer available. | \n| ExchangeLineInactive | - | The error originated from target, when MAC2 2119 appointment cannot be provided for inactive line.\t|\n| MissingCredentials | - | Error from downstream. |\n| MissingRequestBody |  - | Error from downstream. |\n| MissingData | - | Error from downstream.|\n| InvalidData | - | Error from downstream. |\n| ProductNotSupported | - | invalid productCode & accessTechnology combination. |\n| appointmentTypeNotSupported | - | appointmentType not supported.|"
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '26'
+                    message: 'Invalid header value: <parameter>'
+                Backend error:
+                  value:
+                    code: SiteVisitReasonNotSuported
+                    reason: The SiteVisitReason is not supported for this product.
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '401':
+          $ref: '#/components/responses/APIGWUnauthorized'
+        '403':
+          description: >-
+            Forbidden
+                
+            | Code | Message   | Description |
+
+            | ---- | -------   | ----------- |
+
+            | 50 | Access denied | The client application is not authorised to
+            call this resource. |
+
+            | ExchangeLineAssignedToAnotherCP | - | Error from downstream. |
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '50'
+                    message: Access denied
+                Backend error:
+                  value:
+                    code: ExchangeLineAssignedToAnotherCP
+                    reason: >-
+                      The exchange line is in use by another communication
+                      provider.
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '405':
+          $ref: '#/components/responses/APIGWMethodNotAllowed'
+        '415':
+          description: >-
+            Unsupported Media Type
+                
+            | Code | Message   | Description |
+
+            | ---- | -------   | ----------- |
+
+            | 68 | Unsupported media type | The request body does not match a
+            supported content-type. |   
+
+            | UnsupportedMediaType | - | Error from downstream. |
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '68'
+                    message: Unsupported media type
+                Backend error:
+                  value:
+                    code: UnsupportedMediaType
+                    reason: Service requires application/json
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '429':
+          $ref: '#/components/responses/APIGWTooManyRequests'
+        '500':
+          description: |
+            Internal Server Error
+
+
+            | code | message   | Description |
+            | ---- | -------   | ----------- |
+            | 01 | Internal Error | BT error code. |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/failureResponse'
+              example:
+                code: '01'
+                message: Internal Error
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/Exception'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCode'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystem'
+            Content-Type:
+              $ref: '#/components/headers/ContentType'
+  /common/appointmentManagement/v4/appointment:
+    post:
+      summary: Create appointment
+      operationId: createAppointment
+      description: "<p>Reserves an engineering appointment and returns an appointment ID for use in subsequent API calls.</p>      \t <p>This API supports TLS mutual authentication.</p>\n <details>\n <summary><b>Sandbox responses</b></summary>\n\n  <p>The sandbox supports a number of success and failure scenarios. Use the parameters below in the sandbox API call to generate the corresponding responses.</p>\n  <p>Success scenarios responses are simulated based on the parameters mentioned in the table.</p>\n\n  <p>Back-end error scenarios responses are simulated based on APIGW-Tracking-Header.</p>\n\n  <details>\n  <summary><b>Success scenarios</b></summary> \n\n  | Parameters| Sandbox response invoked | Description |\n  | ----------- | ------------------- | ------------------ |\n  | <i>name</i>='DirectoryNumber', <i>value</i>='2277264355'. | 201 | Retrieve product appointments based on 'DirectoryNumber'. |\n  | <i>id</i>='R0123457890'. | 201 | Retrieve get product appointments based on product place ID. |\n  \n\n  </details>\n\n  <details>\n  <summary><b>Error scenarios</b></summary>    \n\n  | APIGW-Tracking-Header | Sandbox response invoked | Description |\n  | ----------- | ------------ | ------------ | \n  | E40001 | 400, TimeSlotNotSupported | The product does not support appointments in that slot. |\n  | E40301 | 403, ExchangeLineAssignedToAnotherCP | The exchange line is in use　by another communication provider. |\n\n  \n  </details>\n  </details>"
+      x-codeSamples:
+        - lang: Shell
+          label: cURL
+          source: >
+            curl -XPOST
+
+            -H "APIGW-Tracking-Header: 96bb97fa-b941-46bb-8c4e-86c616c28a13"
+
+            -H "Authorization: Bearer SZrYQsmi9tvGj1XwmKr5lXD4dpXY" 
+
+            -H "productFamily: ethernet"
+
+            -H "Content-Type: application/json"
+
+            https://api-sandbox.wholesale.bt.com/common/appointmentManagement/v4/searchTimeSlot
+
+            {
+              "relatedEntity": [
+                  {
+                    "appointmentType": "Standard",
+                    "siteVisitReason": "Standard",
+                    "product": {
+                     "productSpecification": {
+                      "id": "Etherway Superfast GEA"
+                     }
+                     "characteristic": [
+                      {
+                                        "name": "DirectoryNumber",
+                                        "value": "2277264355"
+                      },
+                      {
+                                        "name": "AccessTechnology",
+                                        "value": "Generic Ethernet Access"
+                      }
+                     ]
+                    },
+                    "id": "1",
+                    "role": "OrderInformation",
+                    "@referredType": "BTProductAppointmentSpecification",
+                    "@type": "BTProductAppointmentSpecification",
+                    "@baseType": "RelatedEntity"
+                  }
+                  ],
+                   "validFor": {
+                             "startDateTime": "2020-03-17T09:00:00.000Z",
+                             "endDateTime": "2020-03-17T11:00:00.000Z"
+                               }
+            }
+             
+      security:
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/APIGWTrackingHeader'
+        - $ref: '#/components/parameters/BearerAuthorisation'
+        - $ref: '#/components/parameters/productFamily'
+        - $ref: '#/components/parameters/JSONContentType'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postAppointmentRequest'
+            examples:
+              For ethernet directory number:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: Etherway Superfast GEA
+                        characteristic:
+                          - name: DirectoryNumber
+                            value: '12345678912'
+                          - name: AccessTechnology
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  validFor:
+                    startDateTime: '2022-03-17T09:00:00.000Z'
+                    endDateTime: '2022-03-17T11:00:00.000Z'
+              For ethernet address key:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: Etherway Superfast GEA
+                        place:
+                          - id: R0123457890
+                            role: InstallationAddress
+                            '@referredType': OpenreachAddress
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  validFor:
+                    startDateTime: '2022-03-17T09:00:00.000Z'
+                    endDateTime: '2022-03-17T11:00:00.000Z'
+              For BB1 directory number:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        characteristic:
+                          - name: AccessTechnology
+                            value: FTTC
+                          - name: DirectoryNumber
+                            value: '02890830541'
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  validFor:
+                    endDateTime: '2022-02-23T13:00:00Z'
+                    startDateTime: '2022-02-23T08:00:00Z'
+              For BB1 addresskey:
+                value:
+                  relatedEntity:
+                    - appointmentType: Standard
+                      siteVisitReason: Standard
+                      product:
+                        productSpecification:
+                          id: BB1
+                        characteristic:
+                          - name: AccessTechnology
+                            value: FTTP
+                        place:
+                          - id: A90000423408
+                            role: InstallationAddress
+                            '@referredType': OpenreachAddress
+                      id: '1'
+                      role: OrderInformation
+                      '@referredType': BTProductAppointmentSpecification
+                      '@type': BTProductAppointmentSpecification
+                      '@baseType': RelatedEntity
+                  validFor:
+                    endDateTime: '2022-03-08T18:00:00Z'
+                    startDateTime: '2022-03-08T13:00:00Z'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postAppointmentResponse'
+              examples:
+                For ethernet directory number:
+                  value:
+                    id: '1234567812'
+                    status: initialized
+                    creationDate: '2022-02-01T14:40:43.071Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: Etherway Superfast GEA
+                          characteristic:
+                            - name: DirectoryNumber
+                              value: '2277264355'
+                            - name: AccessTechnology
+                              value: Generic Ethernet Access
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    validFor:
+                      startDateTime: '2022-03-17T09:00:00.000Z'
+                      endDateTime: '2022-03-17T11:00:00.000Z'
+                For ethernet address key:
+                  value:
+                    id: '1234567812'
+                    status: initialized
+                    creationDate: '2022-02-01T14:40:43.071Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: Etherway Superfast GEA
+                          place:
+                            - id: R0123457890
+                              role: InstallationAddress
+                              '@referredType': OpenreachAddress
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    validFor:
+                      startDateTime: '2022-03-17T09:00:00.000Z'
+                      endDateTime: '2022-03-17T11:00:00.000Z'
+                For BB1 directory number:
+                  value:
+                    id: 005B5ADFR
+                    status: initialized
+                    creationDate: '2022-02-21T11:35:00Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: BB1
+                          characteristic:
+                            - name: AccessTechnology
+                              value: FTTC
+                            - name: DirectoryNumber
+                              value: '02890830541'
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    validFor:
+                      startDateTime: '2022-02-23T08:00:00Z'
+                      endDateTime: '2022-02-23T13:00:00Z'
+                For BB1 addresskey:
+                  value:
+                    id: 005B8E0FR
+                    status: initialized
+                    creationDate: '2022-02-24T07:10:42Z'
+                    relatedEntity:
+                      - appointmentType: Standard
+                        siteVisitReason: Standard
+                        product:
+                          productSpecification:
+                            id: BB1
+                          characteristic:
+                            - name: AccessTechnology
+                              value: FTTP
+                          place:
+                            - id: A90000423408
+                              role: InstallationAddress
+                              '@referredType': OpenreachAddress
+                        id: '1'
+                        role: OrderInformation
+                        '@referredType': BTProductAppointmentSpecification
+                        '@type': BTProductAppointmentSpecification
+                        '@baseType': RelatedEntity
+                    validFor:
+                      startDateTime: '2022-03-08T13:00:00Z'
+                      endDateTime: '2022-03-08T18:00:00Z'
+        '400':
+          description: "Bad Request\n    \n| Code | Message  | Description |\n| ---- | -------   | ----------- |\n| 21 | Missing body | This resource requires a body to be provided in the request.|\n| 22 | Invalid body | The posted body is not well-formed and thus cannot be parsed. |\n| 23 | Missing body field | Some required body fields are missing. |\n| 25 | Missing header: \\<parameter\\>| The indicated parameter is missing from the request header. |\n| 26 | Invalid header value: \\<parameter\\> | The indicated parameter in the request header is not recognized. |\n| SiteVisitReasonNotSuported | - |  The error originated from target, when passed <i>siteVisitReason</i> not allowed for the specified product. | \n| SimNotSupported | - | The error originated from target, when invalid <i>productCode & simProvide</i> flag combination. |\n| MissingLocationIdentifier | - | The error originated from target, when neither <i>DirectoryNumber</i> nor address supplied.|\n| TooManyLocationIdentifiers | - |  The error originated from target, when both <i>DirectoryNumber</i> and address supplied. | \n| TimeSlotNotSupported | - | The error originated from target, when data is valid but we don't support (e.g. ALLDAY) slot for G.Fast.|\n| AccessLineIdNotRecognised | - | The error originated from target, when  data could not be returned as the access line ID was not recognised.\t|\n| NewExchangeLineNotSupported | - |  The error originated from target, when <i>NewExchangeLine</i> included in appointment request for 'non-SOGEA/SOGFASTline'. | \n| NoDirectoryNumberForAccessLineId\t | - | The error originated from target, when no installation directory number exists for the given access line ID.|\n| InvalidInputCombination | - | The error originated from target, when the location identifier, sim flag and product combination is not supported.|\n| TimeSlotNotAvailable | - |  The error originated from target, when MAC2 2131 the appointment slot you are trying to reserve is no longer available. | \n| ExchangeLineInactive | - | The error originated from target, when MAC2 2119 appointment cannot be provided for inactive line.\t|\n| MissingCredentials | - | Error from downstream. |\n| MissingRequestBody |  - | Error from downstream. |\n| MissingData | - | Error from downstream.|\n| InvalidData | - | Error from downstream. |\n| ProductNotSupported | - | invalid productCode & accessTechnology combination. |\n| appointmentTypeNotSupported | - | appointmentType not supported.|"
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '26'
+                    message: 'Invalid header value: <parameter>'
+                Backend error:
+                  value:
+                    code: SiteVisitReasonNotSuported
+                    reason: The SiteVisitReason is not supported for this product.
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '401':
+          $ref: '#/components/responses/APIGWUnauthorized'
+        '403':
+          description: >-
+            Forbidden
+                
+            | Code | Message   | Description |
+
+            | ---- | -------   | ----------- |
+
+            | 50 | Access denied | The client application is not authorised to
+            call this resource. |
+
+            | ExchangeLineAssignedToAnotherCP | - | Error from downstream. |
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '50'
+                    message: Access denied
+                Backend error:
+                  value:
+                    code: ExchangeLineAssignedToAnotherCP
+                    reason: >-
+                      The exchange line is in use by another communication
+                      provider.
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '405':
+          $ref: '#/components/responses/APIGWMethodNotAllowed'
+        '415':
+          description: >-
+            Unsupported Media Type
+                
+            | Code | Message   | Description |
+
+            | ---- | -------   | ----------- |
+
+            | 68 | Unsupported media type | The request body does not match a
+            supported content-type. |   
+
+            | UnsupportedMediaType | - | Error from downstream. |
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/failureResponseOptional'
+                  - $ref: '#/components/schemas/failureBackendResponse'
+              examples:
+                APIGW error:
+                  value:
+                    code: '68'
+                    message: Unsupported media type
+                Backend error:
+                  value:
+                    code: UnsupportedMediaType
+                    reason: Service requires application/json
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '429':
+          $ref: '#/components/responses/APIGWTooManyRequests'
+        '500':
+          description: |
+            Internal Server Error
+
+
+            | code | message   | Description |
+            | ---- | -------   | ----------- |
+            | 01 | Internal Error | BT error code. |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/failureResponse'
+              example:
+                code: '01'
+                message: Internal Error
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/Exception'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCode'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystem'
+            Content-Type:
+              $ref: '#/components/headers/ContentType'
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: This API requires [OAuth API](/node/360) validation.
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://api.platform.bt.com/oauth/accesstoken?grant_type=client_credentials
+          scopes: {}
+  parameters:
+    APIGWTrackingHeader:
+      name: APIGW-Tracking-Header
+      in: header
+      required: true
+      description: >-
+        A unique reference used to track the transaction end to end. The
+        recommended format is UUID (a 36-character alphanumeric string
+        "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX").
+      schema:
+        type: string
+        example: 96bb97fa-b941-46bb-8c4e-86c616c28a13
+        pattern: ^[\w.~:@-]{1,255}$
+    BearerAuthorisation:
+      name: Authorization
+      in: header
+      description: >-
+        This contains the access token obtained from a call to the OAuth API.
+        </br> The access token is prefixed with the word 'Bearer ' to form the
+        authorisation string.
+      schema:
+        example: Bearer <token>
+        type: string
+    productFamily:
+      name: productFamily
+      in: header
+      example: Ethernet
+      description: |
+        Indicates the product family to which product belongs to.
+      required: true
+      schema:
+        type: string
+        enum:
+          - Ethernet
+          - Broadband-One
+          - BB1Hub
+          - BBOne
+    JSONContentType:
+      name: Content-Type
+      in: header
+      description: The only supported format for the request body is 'application/json'.
+      required: true
+      schema:
+        type: string
+        example: application/json
+  schemas:
+    postSearchAppointmentRequest:
+      type: object
+      properties:
+        relatedEntity:
+          type: array
+          description: List of related entities.
+          items:
+            type: object
+            properties:
+              appointmentType:
+                type: string
+                example: Standard
+                description: >
+                  Type of appointment.</br>Below are possible values:
+                  </br><ul><li>'Standard' - Regular.</li><li>'Expedited' - For
+                  priority appointments.</li><li>'Supplier Failed' - For
+                  rebooking appointment in case of missed
+                  appointments.</li></ul>
+                enum:
+                  - Standard
+                  - Expedited
+                  - Supplier Failed
+              simProvide:
+                type: boolean
+                example: false
+                description: >
+                  The value can be 'true' or 'false', by default this value will
+                  be false if not received in input parameter list. Below are
+                  the possible value:<br/>
+
+                  'false' - Standalone BB Journey.<br/>
+
+                  'true' - SIM2 journey.<br/>
+
+                  Note: <i>simProvide</i> field is not applicable for 'Sogea
+                  request and Ethernet' request.
+              siteVisitReason:
+                type: string
+                example: Standard
+                description: |
+                  Indicates site visit reason for appointment.<br/>
+                  Note: Below are the default values,
+                  <ul><li>FTTC - 'Standard'.</li>
+                  <li>FTTP- 'Standard'. </li>
+                  <li>SOGFast - 'Premium'.</li>
+                  <li>SOGEA- 'Standard'.</li></ul>
+                enum:
+                  - Standard
+                  - Premium
+                  - Advanced
+              newExchangeLine:
+                type: boolean
+                example: false
+                description: >
+                  It is mandatory for 'SOGEA' request. <br/>Note: When request
+                  is for new exchange line value should be 'true' or else
+                  'false'.
+              product:
+                type: object
+                description: Indicates the <i>product</i> details.
+                properties:
+                  productSpecification:
+                    type: object
+                    description: Place holder for capturing product details.
+                    properties:
+                      id:
+                        type: string
+                        example: Etherway Superfast GEA
+                        description: >-
+                          Product name for which appointment is being
+                          requested.</br>Etherway Superfast GEA for ethernet
+                          request and BB1 for broadband hubco user.
+                    required:
+                      - id
+                  characteristic:
+                    type: array
+                    description: >
+                      List of product characteristics. Characteristics of the
+                      product to instantiate or to modify.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: AccessTechnology
+                          description: >
+                            Product characteristic <i>name</i>. </b>Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.
+                          enum:
+                            - DirectoryNumber
+                            - AccessTechnology
+                            - AccessLineId
+                        value:
+                          type: string
+                          example: Generic Ethernet Access
+                          description: >
+                            Product characteristic <i>value</i>.</br> Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.</br>
+
+                            Below are possible values when 'AccessTechnology' is
+                            passed in <i>characteristic.name</i>,
+                             <ul><li>'Generic Ethernet Access'</li><li>'Generic Ethernet Access – FTTP'</li><li>
+                             'SOGEA Existing Line'</li><li>'SOGEA New Line'</li><li>'SOGEA GFAST New Line'</li><li>'SOGEA GFAST Existing Line'</li><li>'FTTC'</li><li>'FTTC GFAST'</li><li>'FTTC Sim2'</li><li>'FTTC GFAST Sim2'</li><li>'FTTP'</li><li>'SOADSL'</li><li>'FTTP Shift ONT'</li><li>'ADSL'</li></ul>
+                  place:
+                    type: array
+                    description: >
+                      List of places.</br>Note: This list is passed when search
+                      is made based on address key.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: >
+                            Unique identifier of the customer place.</br>Note:
+                            This field is passed when <i>place</i> list is
+                            passed in request. ID value represents address key
+                            that we received from the 'Common Geographic Address
+                            Management API -GET /geographicAddress API'.
+                          example: Z17090800001
+                        role:
+                          type: string
+                          description: >
+                            Role of the customer place.</br>Note: This field is
+                            passed when <i>place</i> list is passed in request.
+                          example: InstallationAddress
+                        '@referredType':
+                          type: string
+                          description: >
+                            Indicates respective place.</br>Note: This field is
+                            passed when <i>place</i> list is passed in request.
+                          example: OpenreachAddress
+                required:
+                  - productSpecification
+              id:
+                type: string
+                description: Identifier of the respective entity.
+                example: '1234'
+              role:
+                type: string
+                description: Role of the respective entity.
+                example: OrderInformation
+              '@referredType':
+                type: string
+                description: Referred type of the respective entity.
+                example: BTProductAppointmentSpecification
+              '@type':
+                type: string
+                description: Type of the respective entity.　
+                example: BTProductAppointmentSpecification
+              '@baseType':
+                type: string
+                description: Base type of the respective entity.
+                example: RelatedEntity
+            required:
+              - product
+              - id
+              - role
+              - '@type'
+              - '@baseType'
+              - '@referredType'
+        requestedTimeSlot:
+          type: array
+          description: Only one timeslot in the list is accepted.
+          items:
+            type: object
+            properties:
+              validFor:
+                type: object
+                description: Valid timeslot for the given request.
+                properties:
+                  startDateTime:
+                    type: string
+                    description: Start time for the given request. Format is TMF date.
+                    example: '2022-01-17T09:00:00.000Z'
+                required:
+                  - startDateTime
+            required:
+              - validFor
+      required:
+        - relatedEntity
+        - requestedTimeSlot
+    postSearchAppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for customer reference of the respective entity.
+          example: '1234567812'
+        status:
+          type: string
+          example: inProgress
+          description: Status of the requested slot.
+          enum:
+            - rejected
+            - inProgress
+            - done
+            - terminatedWithError
+        searchDate:
+          type: string
+          description: Search date for the given request. Format is TMF date format.
+          example: '2022-01-07T14:56:21.000Z'
+        relatedEntity:
+          type: array
+          description: List of related entities.
+          items:
+            type: object
+            properties:
+              simProvide:
+                type: boolean
+                example: true
+                description: >-
+                  The value can be 'true or false', by default this value will
+                  be 'false' if not received in input parameter list.
+              newExchangeLine:
+                type: boolean
+                example: false
+                description: Indicates new exchange for SOGEA.
+              appointmentType:
+                type: string
+                example: Standard
+                description: >
+                  Type of an appointment. </br>Below are possible
+                  values:</br><ul><li>'Standard' - Regular.</li><li>'Expedited'
+                  - For priority appointments.</li><li>'Supplier Failed' - For
+                  rebooking appointment in case of missed
+                  appointments.</li></ul>
+                enum:
+                  - Standard
+                  - Expedited
+                  - Supplier Failed
+              siteVisitReason:
+                type: string
+                example: Standard
+                description: >
+                  Indicates site visit reason. This field required to have
+                  values either 'Standard or Premium', refer below note for
+                  default values.
+
+                  Note: Below are the default values,
+
+                  <ul><li>FTTC - 'Standard'.</li>
+
+                  <li>FTTP - 'Standard'. </li>
+
+                  <li>SOGFast - 'Premium'.</li>
+
+                  <li>SOGEA - 'Standard'.</li></ul>
+                enum:
+                  - Standard
+                  - Premium
+              product:
+                type: object
+                description: Indicates <i>product</i> details.
+                properties:
+                  productSpecification:
+                    type: object
+                    description: >-
+                      Indicates detailed description of a tangible or intangible
+                      object made available externally in the form of a
+                      'productOffering' to customers or other parties playing a
+                      party role.　
+                    properties:
+                      id:
+                        type: string
+                        description: >
+                          Unique identifier of the product
+                          specification.</br>Note: It is the 'SCODE' of the
+                          product, there is no length validation on the 'SCODE'.
+                          The passed 'SCODE' must be valid.
+                        example: S0432072
+                  characteristic:
+                    type: array
+                    description: >
+                      Indicates list of product characteristics. Characteristics
+                      of the product to instantiate or to modify.</br>Note: This
+                      list is passed when directory number search is made.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: AccessTechnology
+                          description: >
+                            Product characteristic <i>name</i>. </b>Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.
+                          enum:
+                            - DirectoryNumber
+                            - AccessTechnology
+                            - AccessLineId
+                        value:
+                          type: string
+                          example: Generic Ethernet Access
+                          description: >
+                            Product characteristic <i>value</i>.</br> Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.</br>
+                             Below are possible values when 'AccessTechnology' is passed in <i>characteristic.name</i>,
+                             <ul><li>'Generic Ethernet Access'</li><li>'Generic Ethernet Access - FTTP'</li><li>
+                             'SOGEA Existing Line'</li><li>'SOGEA New Line'</li><li>'SOGEA GFAST New Line'</li><li>'SOGEA GFAST Existing Line'</li><li>'FTTC'</li><li>'FTTC GFAST'</li><li>'FTTC Sim2'</li><li>'FTTC GFAST Sim2'</li><li>'FTTP'</li></ul>
+                  place:
+                    type: array
+                    description: >
+                      List of places.</br>Note: This list is passed when search
+                      is made based on address key.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: >
+                            Unique identifier of the respective place.</br>Note:
+                            This field is passed when <i>place</i> list is
+                            passed in request. ID value represents address key
+                            that we received from the 'Common Geographic Address
+                            Management API -GET /geographicAddress API'.
+                          example: Z17090800001
+                        role:
+                          type: string
+                          description: >
+                            Role of the respective place.</br>Note: This field
+                            is passed when <i>place</i> list is passed in
+                            request.
+                          example: InstallationAddress
+                        '@referredType':
+                          type: string
+                          description: >
+                            Indicates the referred type of the respective
+                            place.</br>Note: This field is passed when
+                            <i>place</i> list is passed in request.
+                          example: OpenreachAddress
+                required:
+                  - productSpecification
+              id:
+                type: string
+                description: Identifier of the respective entity.
+                example: '1234'
+              role:
+                type: string
+                description: Indicates the role of the respective entity.
+                example: OrderInformation
+              '@type':
+                type: string
+                description: Type of the appointment resource.
+                example: BTProductAppointmentSpecification
+              '@baseType':
+                type: string
+                description: Base type of the respective entity.
+                example: RelatedEntity
+              '@referredType':
+                type: string
+                description: Referred type of the respective entity.
+                example: BTProductAppointmentSpecification
+            required:
+              - id
+              - role
+              - '@type'
+              - '@referredType'
+              - '@baseType'
+              - product
+        requestedTimeSlot:
+          type: array
+          description: List of requested time slots.
+          items:
+            type: object
+            properties:
+              validFor:
+                type: object
+                description: Valid time slot for the given request.
+                properties:
+                  startDateTime:
+                    type: string
+                    description: Start time for the given request. Format is TMF date.
+                    example: '2021-01-17T09:00:00.000Z'
+                required:
+                  - startDateTime
+            required:
+              - validFor
+        availableTimeSlot:
+          type: array
+          description: List of available time slots.
+          items:
+            type: object
+            properties:
+              slot:
+                type: string
+                description: Indicates the slot for the given request.
+                example: '0900'
+              validFor:
+                type: object
+                description: >-
+                  Valid time slot for the given request. Difference between
+                  start date time and end date time provides the slot duration.
+                properties:
+                  startDateTime:
+                    type: string
+                    description: Start time for the given request.
+                    example: '2022-01-17T09:00:00.000Z'
+                  endDateTime:
+                    type: string
+                    description: End time for the given request.
+                    example: '2022-01-18T09:00:00.000Z'
+                required:
+                  - startDateTime
+                  - endDateTime
+            required:
+              - slot
+              - validFor
+      required:
+        - id
+        - status
+        - searchDate
+        - relatedEntity
+        - requestedTimeSlot
+        - availableTimeSlot
+    failureResponseOptional:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Represents the error code.
+        message:
+          type: string
+          description: Represents the error message.
+    failureBackendResponse:
+      type: object
+      required:
+        - code
+        - reason
+      properties:
+        code:
+          type: string
+          description: Represents the error code.
+        reason:
+          type: string
+          description: Represents the error message.
+    failureResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Represents the error code.
+        message:
+          type: string
+          description: Represents the error message.
+    postAppointmentRequest:
+      type: object
+      properties:
+        relatedEntity:
+          type: array
+          description: List of related entities.
+          items:
+            type: object
+            properties:
+              simProvide:
+                type: boolean
+                example: true
+                description: >
+                  The value can be 'true or false', by default this value will
+                  be false if not received in input parameter list. Below are
+                  the possible value:<br/>
+
+                  'false'- Standalone BB Journey.<br/>
+
+                  'true' -SIM2 journey.<br/>
+
+                  Note: <i>simProvide</i> field is not applicable for 'SOGEA
+                  request and Ethernet' request.            
+              appointmentType:
+                type: string
+                example: Standard
+                description: >
+                  Type of appointment.</br>Below are possible values:
+                  </br><ul><li>'Standard'- Regular.</li><li>'Expedited' - For
+                  priority appointments.</li><li>'Supplier Failed' - For
+                  rebooking appointment in case of missed
+                  appointments.</li></ul>
+                enum:
+                  - Standard
+                  - Expedited
+                  - Supplier Failed
+              siteVisitReason:
+                type: string
+                example: Standard
+                description: |
+                  Indicates site visit reason for appointment.
+                  Note: Below are the default values,
+                  <ul><li>FTTC - 'Standard'.</li>
+                  <li>FTTP - 'Standard'. </li>
+                  <li>SOGFast - 'Premium'.</li>
+                  <li>SOGEA- 'Standard'.</li></ul>
+                enum:
+                  - Standard
+                  - Premium
+                  - Advanced
+              newExchangeLine:
+                type: boolean
+                example: false
+                description: >
+                  It is mandatory for 'SOGEA' request. <br/>Note: When request
+                  is for new exchange line value should be 'true' or else
+                  'false'.
+              product:
+                type: object
+                description: Indicates <i>product</i> details.
+                properties:
+                  productSpecification:
+                    type: object
+                    description: >-
+                      Place holder for capturing product details against which
+                      appointment is being booked.
+                    properties:
+                      id:
+                        type: string
+                        description: >-
+                          Product name for which appointment is being
+                          requested.</br>Etherway Superfast GEA for ethernet
+                          request and BB1 for broadband hubco user.
+                        example: Etherway Superfast GEA
+                    required:
+                      - id
+                  characteristic:
+                    type: array
+                    description: >
+                      Indicates list of product characteristics. Characteristics
+                      of the product to instantiate or to modify.</br>Note: This
+                      list is passed when directory number search is made.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: AccessTechnology
+                          description: >
+                            Product characteristic <i>name</i>. </b>Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.
+                          enum:
+                            - DirectoryNumber
+                            - AccessTechnology
+                            - AccessLineId
+                        value:
+                          type: string
+                          example: Generic Ethernet Access
+                          description: >
+                            Product characteristic <i>value</i>.</br> Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.</br>
+
+                            Below are possible values when 'AccessTechnology' is
+                            passed in <i>characteristic.name</i>,
+                             <ul><li>'Generic Ethernet Access'.</li><li>      'Generic Ethernet Access' – FTTP.</li><li>
+                             'SOGEA Existing Line'.</li><li>                       'SOGEA New Line'.</li><li>SOGEA GFAST New Line</li><li>SOGEA GFAST Existing Line</li><li>FTTC</li><li>FTTC GFAST</li><li>FTTC Sim2</li><li>FTTC GFAST Sim2</li><li>FTTP</li><li>'SOADSL'</li><li>'FTTP Shift ONT'</li><li>'ADSL'</li></ul>
+                  place:
+                    type: array
+                    description: >
+                      List of places.</br>Note: This list is passed when search
+                      is made based on address key.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: >
+                            Unique identifier of the customer place.</br>Note:
+                            This field is passed when <i>place</i> list is
+                            passed in request. ID value represents address key
+                            that we received from the 'Common Geographic Address
+                            Management API -GET /geographicAddress API'.
+                          example: Z17090800001
+                        role:
+                          type: string
+                          description: >
+                            Role of the customer place.</br>Note: This field is
+                            passed when <i>place</i> list is passed in request.
+                          example: InstallationAddress
+                        '@referredType':
+                          type: string
+                          description: >
+                            Indicates respective place.</br>Note: This field is
+                            passed when <i>place</i> list is passed in request.
+                          example: OpenreachAddress
+                required:
+                  - productSpecification
+              id:
+                type: string
+                description: Identifier of the respective entity.
+                example: '1234'
+              role:
+                type: string
+                description: Role of the respective entity.
+                example: OrderInformation
+              '@referredType':
+                type: string
+                description: Referred type of the respective entity.
+                example: BTProductAppointmentSpecification
+              '@type':
+                type: string
+                description: Type of the respective entity.　
+                example: BTProductAppointmentSpecification
+              '@baseType':
+                type: string
+                description: Base type of the respective entity.
+                example: RelatedEntity
+            required:
+              - product
+              - id
+              - role
+              - '@type'
+              - '@baseType'
+              - '@referredType'
+        validFor:
+          type: object
+          description: List of requested time slots.
+          properties:
+            startDateTime:
+              type: string
+              example: '2022-03-17T09:00:00Z'
+              description: Start time for the given request.
+            endDateTime:
+              type: string
+              example: '2022-03-17T11:00:00Z'
+              description: End time for the given request.
+          required:
+            - startDateTime
+            - endDateTime
+      required:
+        - relatedEntity
+        - validFor
+    postAppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Appointment ID for the confirmed appointment.</br>This ID should be
+            used in the request for the order journey.
+          example: '1234567812'
+        status:
+          type: string
+          example: inProgress
+          description: Indicates the <i>status</i> of the requested slot.
+          enum:
+            - confirmed
+            - inProgress
+            - cancelled
+            - initialized
+            - completed
+            - failed
+        creationDate:
+          type: string
+          example: '2022-03-07T14:56:21.000Z'
+          description: >-
+            Indicates the creation date for the given request. Format is TMF
+            date.
+        relatedEntity:
+          type: array
+          description: List of related entities.
+          items:
+            type: object
+            properties:
+              simProvide:
+                type: boolean
+                example: true
+                description: >-
+                  The value can be 'true' or 'false', by default this value will
+                  be false if not received in input parameter list.
+              newExchangeLine:
+                type: boolean
+                example: false
+                description: Indicates new exchange for SOGEA.
+              appointmentType:
+                type: string
+                example: Standard
+                description: >
+                  Type of an appointment. </br>Below are possible
+                  values:</br><ul><li>'Standard' - Regular.</li><li>'Expedited'
+                  - For priority appointments.</li><li>'Supplier Failed' - For
+                  rebooking appointment in case of missed
+                  appointments.</li></ul>
+                enum:
+                  - Standard
+                  - Expedited
+                  - Supplier Failed
+              siteVisitReason:
+                type: string
+                example: Standard
+                description: >
+                  Indicates site visit reason. This field required to have
+                  values either 'Standard or Premium', refer below note for
+                  default values.
+
+                  Note: Below are the default values,
+
+                  <ul><li>FTTC - 'Standard'.</li>
+
+                  <li>FTTP - 'Standard'. </li>
+
+                  <li>SOGFast - 'Premium'.</li>
+
+                  <li>SOGEA- 'Standard'.</li></ul>
+                enum:
+                  - Standard
+                  - Premium
+              product:
+                type: object
+                description: Indicates <i>product</i> details.
+                properties:
+                  productSpecification:
+                    type: object
+                    description: >-
+                      Indicates detailed description of a tangible or intangible
+                      object made available externally in the form of a
+                      'productOffering' to customers or other parties playing a
+                      party role.　
+                    properties:
+                      id:
+                        type: string
+                        description: >
+                          Unique identifier of the product
+                          specification.</br>Note: It is the 'SCODE' of the
+                          product, there is no length validation on the 'SCODE'.
+                          The passed 'SCODE' must be valid.
+                        example: S0432072
+                    required:
+                      - id
+                  characteristic:
+                    type: array
+                    description: >
+                      Indicates list of product characteristics. Characteristics
+                      of the product to instantiate or to modify.</br>Note: This
+                      list is passed when directory number search is made.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: AccessTechnology
+                          description: >
+                            Product characteristic <i>name</i>. </b>Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.
+                          enum:
+                            - DirectoryNumber
+                            - AccessTechnology
+                            - AccessLineId
+                        value:
+                          type: string
+                          example: Generic Ethernet Access
+                          description: >
+                            Product characteristic <i>value</i>.</br> Note: This
+                            field is passed when <i>characteristic</i> list is
+                            passed in request.</br>
+                             Below are possible values when 'AccessTechnology' is passed in <i>characteristic.name</i>,
+                             <ul><li>'Generic Ethernet Access'.</li><li>'Generic Ethernet Access' – FTTP.</li><li>
+                             'SOGEA Existing Line'.</li><li>'SOGEA New Line'</li><li>SOGEA GFAST New Line</li><li>SOGEA GFAST Existing Line</li><li>FTTC</li><li>FTTC GFAST</li><li>FTTC Sim2</li><li>FTTC GFAST Sim2</li><li>FTTP</li></ul>
+                  place:
+                    type: array
+                    description: >
+                      List of places.</br>Note: This list is passed when search
+                      is made based on address key.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: >
+                            Unique identifier of the respective place.</br>Note:
+                            This field is passed when <i>place</i> list is
+                            passed in request. ID value represents address key
+                            that we received from the 'Common Geographic Address
+                            Management API -GET /geographicAddress API'.
+                          example: Z17090800001
+                        role:
+                          type: string
+                          description: >
+                            Role of the respective place.</br>Note: This field
+                            is passed when <i>place</i> list is passed in
+                            request.
+                          example: InstallationAddress
+                        '@referredType':
+                          type: string
+                          description: >
+                            Indicates the referred type of the respective
+                            place.</br>Note: This field is passed when
+                            <i>place</i> list is passed in request.
+                          example: OpenreachAddress
+                required:
+                  - productSpecification
+              id:
+                type: string
+                description: Identifier of the respective entity.
+                example: '1234'
+              role:
+                type: string
+                description: Indicates the role of the respective entity.
+                example: OrderInformation
+              '@type':
+                type: string
+                description: Type of the appointment resource.
+                example: BTProductAppointmentSpecification
+              '@baseType':
+                type: string
+                description: Base type of the respective entity.
+                example: RelatedEntity
+              '@referredType':
+                type: string
+                description: Referred type of the respective entity.
+                example: BTProductAppointmentSpecification
+            required:
+              - product
+              - id
+              - role
+              - '@type'
+              - '@baseType'
+              - '@referredType'
+        validFor:
+          type: object
+          description: List of requested time slots.
+          properties:
+            startDateTime:
+              type: string
+              example: '2022-03-17T09:00:00Z'
+              description: Start time for the given request. Format is TMF date format.
+            endDateTime:
+              type: string
+              example: '2022-03-17T11:00:00Z'
+              description: End time for the given request. Format is TMF date format.
+          required:
+            - startDateTime
+            - endDateTime
+      required:
+        - id
+        - status
+        - relatedEntity
+        - validFor
+  headers:
+    ExceptionOptional:
+      schema:
+        type: string
+      description: Header carrying the message of the exception.
+    ExceptionCodeOptional:
+      schema:
+        type: string
+      description: Header carrying the code of the exception.
+    ExceptionSystemOptional:
+      schema:
+        type: string
+      description: Header carrying the system from which the exception has originated.
+    ContentTypeOptional:
+      schema:
+        type: string
+      description: This indicates the format of the error response.
+    Exception:
+      schema:
+        type: string
+      description: Header carrying the message of the exception.
+      required: true
+    ExceptionCode:
+      schema:
+        type: string
+      description: Header carrying the code of the exception.
+      required: true
+    ExceptionSystem:
+      schema:
+        type: string
+      description: Header carrying the system from which the exception has originated.
+      required: true
+    ContentType:
+      schema:
+        type: string
+      description: This indicates the format of the error response.
+      required: true
+  responses:
+    APIGWUnauthorized:
+      description: >
+        Unauthorized
+
+
+        | Code | Message | Description |
+
+        | ---- | ------- | ----------- |
+
+        | 40 | Missing credentials | The <i>Authorization</i> parameter is
+        missing. |
+
+        | 41 | Invalid credentials | The <i>Authorization</i> parameter is not
+        valid. |
+
+        | 42 | Expired credentials | Renew the access token using the OAuth API
+        and try again. |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '41'
+            message: Invalid credentials
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'
+    APIGWMethodNotAllowed:
+      description: >
+        Method Not Allowed
+
+
+        | Code | Message   | Description |
+
+        | ---- | -------   | ----------- |
+
+        | 61 | Method not allowed | The requested method is not supported by
+        this resource. |   
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '61'
+            message: Method not allowed
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'
+    APIGWTooManyRequests:
+      description: >
+        Forbidden
+
+
+        | Code | Message | Description |
+
+        | ---- | ------- | ----------- |
+
+        | 53 | Too many requests | The client application has made too many
+        requests in a short time; please try again later. |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '53'
+            message: Too many requests
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'

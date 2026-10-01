@@ -1,0 +1,1605 @@
+openapi: 3.0.0
+info:
+  title: Address Management
+  description: >-
+    Search the Rest of BT (RoBT) and Openreach address databases to find address
+    records and keys to be used in orders. Where no suitable matching address is
+    found, create an address and obtain a temporary address key.
+  version: '0.6'
+servers:
+  - url: https://api.wholesale.bt.com
+    description: Production
+  - url: https://api-sandbox.wholesale.bt.com
+    description: Sandbox
+paths:
+  /common/geographicAddressManagement/v1/geographicAddress:
+    get:
+      summary: Address records
+      operationId: getGeographicAddress
+      description: >-
+
+        <p>Returns an array of address records including associated address
+        keys, required for subsequent API calls.
+
+        </p>
+
+        <p>When searching the address databases, the API can be used to find
+        matching pairs across the RoBT and Openreach databases. <br/>Technology
+        markers for Openreach address records can also be retrieved which
+        indicate the network types associated with address keys.<br/></p>
+
+        <p>For the RoBT address database only, where a suitable matching address
+        is not found, an address can be created to obtain a temporary address
+        key.<br/></p>
+
+        <p>The valid combinations of search parameters are listed below...<br/>
+
+        <ul><li>postcode</li>
+
+        <li>postcode + streetNr</li>
+
+        <li>postcode + buildingName</li>
+
+        <li>city + streetName + streetNr</li>
+
+        <li>city + streetName + buildingName</li>
+
+        <li>uprn</li>
+
+        </ul> 
+
+
+      
+
+        <details>
+
+
+        <summary><b>Sandbox responses</b></summary>
+
+        <p>The sandbox supports a number of success and failure scenarios. Use
+        the parameters below in the sandbox API call to generate the
+        corresponding responses.</p>
+
+        <p>Success example responses are simulated based on the query parameters
+        provided in the request.</p>
+
+        <p>Back-end error example responses are simulated based on
+        APIGW-Tracking-Header.</p>
+
+
+        <details>
+
+        <summary><b>Success scenarios</b></summary> 
+
+
+        | Combination of query parameters | Sandbox response invoked |
+        Description |
+
+        | ------------------------------- | ---------------- | ----------- |
+
+        | <I>postcode</I>='B33 8PJ', <I>addressSource</I>='ROBT' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='B33 8PJ', <I>addressSource</I>='Openreach' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='HA0 4QS', <I>addressSource</I>='ROBT' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='HA0 4QS', <I>addressSource</I>='Openreach' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='IP1 1TG', <I>addressSource</I>='ROBT' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='IP1 1TG', <I>addressSource</I>='Openreach' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='AB10 1HP', <I>addressSource</I>='ROBT' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='AB10 1HP', <I>addressSource</I>='Openreach' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>addressSource</I>. |
+
+        | <I>postcode</I>='RH15 0NX', <I>isSpatialRefBng</I>='false' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>isSpatialRefBng</I> is false. |
+
+        | <I>postcode</I>='AB10 1HP', <I>isSpatialRefBng</I>='true' | 200 |
+        Retrieve address successfully based on the <I>postcode</I> and
+        <I>isSpatialRefBng</I> is true. |
+
+        | <I>postcode</I>='AB10 1HP', <I>buildingName</I>='Riverside Tower',
+        <I>isSpatialRefBng</I>='false' | 200 | Retrieve address successfully
+        based on the <I>postcode</I>, <I>buildingName</I> and
+        <I>isSpatialRefBng</I> is false. |
+
+        | <I>postcode</I>='AB10 1HP', <I>buildingName</I>='Riverside Tower',
+        <I>isSpatialRefBng</I>='true' | 200 | Retrieve address successfully
+        based on the <I>postcode</I>, <I>buildingName</I> and
+        <I>isSpatialRefBng</I> is false. |
+
+        | <I>postcode</I>='AB10 1HP', <I>streetNr</I>='10',
+        <I>isSpatialRefBng</I>='false' | 200 | Retrieve address successfully
+        based on the <I>postcode</I> and <I>streetNr</I> and
+        <I>isSpatialRefBng</I> is false. |
+
+        | <I>postcode</I>='AB10 1HP', <I>streetNr</I>='10',
+        <I>isSpatialRefBng</I>='true' | 200 | Retrieve address successfully
+        based on the <I>postcode</I> and <I>streetNr</I> and when
+        <I>isSpatialRefBng</I> is true. |
+
+        | <I>postcode</I>='AB10 1HP',
+        <I>isSiteClassificationRequired</I>='true',
+        <I>isTechonologyMarkersRequired</I>='true',
+        <I>isSpatialRefBng</I>='true' | 200 | Retrieve address successfully
+        based on the <I>postcode</I>, <I>isSiteClassificationRequired</I> is
+        true, <I>isTechonologyMarkersRequired</I> is true and
+        <I>isSpatialRefBng</I> is true. |
+
+        | <I>postcode</I>='AB10 1HP',
+        <I>isSiteClassificationRequired</I>='true',
+        <I>isTechonologyMarkersRequired</I>='true',
+        <I>isSpatialRefBng</I>='false' | 200 | Retrieve address successfully
+        based on the <I>postcode</I>, <I>isSiteClassificationRequired</I> is
+        true, <I>isTechonologyMarkersRequired</I> is true and
+        <I>isSpatialRefBng</I> is false. |
+
+        | <I>postcode</I>='AB10 1HP', <I>isFuzzyMatch</I>='true',
+        <I>isSpatialRefBng</I>='false' | 200 | Retrieve address successfully
+        based on the <I>postcode</I>, <I>isFuzzyMatch</I> is true and
+        <I>isSpatialRefBng</I> is false. |
+
+
+        </details>
+
+
+        <details>
+
+        <summary><b>Error scenarios</b></summary>
+
+
+        | APIGW-Tracking-Header | Sandbox response invoked | Description | 
+
+        | ----------- | ------------ | ------------ |
+
+        | E02901 | 400, 29 | Bad request. |   
+
+        | E06001 | 404, 60 | Resource not found. |
+
+        | E00101 | 500, 01 | Internal server error. |
+
+        | E00501 | 503, 05 | The service is temporarily unavailable. |
+
+
+        </details>
+
+
+        </details>
+      x-codeSamples:
+        - lang: Shell
+          label: cURL
+          source: >
+            curl -XGET
+
+            -H "APIGW-Tracking-Header: 96bb97fa-b941-46bb-8c4e-86c616c28a13"
+
+            -H "Authorization: Bearer 12gDpD0ai180mFjl3uPwiGLJRDjY"
+
+            -H "correlationId: 1234567872qw976"
+
+            -H "APIGW-Client-Id: YAVF9mhKLbeNOAwB2CGsGOaFWDBjHOQA"
+
+            -H "btDuns: 221283316"
+
+            https://api-sandbox.wholesale.bt.com/common/geographicAddressManagement/v1/geographicAddress?postcode=SW12
+            8NX&isSiteClassificationRequired=true&isTechonologyMarkersRequired=true&isFuzzyMatch=true
+      security:
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/APIGWTrackingHeader'
+        - $ref: '#/components/parameters/BearerAuthorisation'
+        - $ref: '#/components/parameters/correlationId'
+        - name: APIGW-Client-Id
+          in: header
+          description: >-
+            Client identifier provided to the consumer. Mandatory for Siteminder
+            / CAMAG authentication.
+          schema:
+            type: string
+            example: YAVF9mhKLbeNOAwB2CGsGOaFWDBjHOQA
+        - name: btDuns
+          in: header
+          required: false
+          description: >-
+            Client DUNS to used for downstream calls. Hardcoded at Microservice
+            for BBone Journey. Other consumers are expected to be pass this
+            value. e.g. 227015720
+          schema:
+            type: string
+            example: '227015720'
+            maxLength: 500
+            pattern: ^[0-9a-zA-Z _]*$
+        - name: postcode
+          in: query
+          description: >-
+            Descriptor for a postal delivery area, used to speed and simplify
+            the delivery of mail (also known as zipcode).
+          schema:
+            example: NW11 7NG
+            type: string
+            maxLength: 30
+        - name: addressSource
+          in: query
+          description: Source from which address to be retrieved.
+          schema:
+            example: Openreach
+            type: string
+            maxLength: 500
+        - name: buildingName
+          in: query
+          description: >-
+            Premise name. i.e., name of the building, particularly used where
+            there is no street number. Allows for buildings that have well-known
+            names.
+          schema:
+            example: Odeon
+            type: string
+            maxLength: 150
+        - name: uprn
+          in: query
+          description: Unique property reference number.
+          schema:
+            example: '9051030516'
+            type: string
+            maxLength: 500
+        - name: streetNr
+          in: query
+          description: 'Number identifying a specific property on a public street. '
+          schema:
+            example: '5'
+            type: string
+            maxLength: 30
+        - name: subStreet
+          in: query
+          description: >-
+            It is necessary to store additional information as dependent
+            thoroughfare/subStreet to uniquely identify each one, when a
+            thoroughfare/street name exists more than once within a town.
+          schema:
+            example: Stephens
+            type: string
+            maxLength: 100
+        - name: locality
+          in: query
+          description: >-
+            An area of defined or undefined boundaries within a local authority
+            or other legislatively defined area, usually rural or semi-rural in
+            nature. [ANZLIC-STREET], or a suburb a bounded locality within a
+            city, town or shire principally of urban character [ANZLICSTREET].
+          schema:
+            example: LONDON
+            type: string
+            maxLength: 100
+        - name: subLocality
+          in: query
+          description: >-
+            Supporting dependent locality name to uniquely identify a dependent
+            locality.
+          schema:
+            example: Shelley Avenue
+            type: string
+            maxLength: 100
+        - name: subBuilding
+          in: query
+          description: >-
+            An area within a building. The sub premise that will be available
+            under the same premise.
+          schema:
+            example: Flat 1
+            type: string
+            maxLength: 200
+        - name: streetName
+          in: query
+          description: Name of the street or other street type.
+          schema:
+            example: Hoop Lane
+            type: string
+            maxLength: 200
+        - name: city
+          in: query
+          description: City that the address is in.
+          schema:
+            example: LONDON
+            type: string
+            maxLength: 60
+        - name: isSpatialRefBng
+          in: query
+          description: >-
+            Boolean field to indicate whether spatial reference is required for
+            easting and northing.
+          schema:
+            example: false
+            type: boolean
+        - name: id
+          in: query
+          description: |-
+            Unique identifier of the address, this is the NAD key
+
+            Note: Supported for 'ROBT' & 'Openreach' 
+
+            While using NADKey based search, addressSource should be passed.
+          schema:
+            example: Openreach
+            type: string
+            maxLength: 500
+            pattern: ^[0-9a-zA-Z _]*$
+        - name: isSiteClassificationRequired
+          in: query
+          description: >-
+            Boolean field to indicate whether site classification details to be
+            returned in the response.
+          schema:
+            example: false
+            type: boolean
+        - name: isTechonologyMarkersRequired
+          in: query
+          description: >-
+            Boolean field to indicate whether technology
+            markers(copper,PointToPointFibre,FTTPBrownfield, FTTPGreenfield) and
+            restrictions details to be returned in the response.
+          schema:
+            example: false
+            type: boolean
+        - name: isFuzzyMatch
+          in: query
+          description: >-
+            Boolean field to indicate whether the Openreach address and ROBT
+            address are to be matched.
+          schema:
+            example: true
+            type: boolean
+        - name: searchType
+          in: query
+          description: If the searchType is match it will do exact match in the LOCUS.
+          schema:
+            example: Match
+            type: string
+            maxLength: 500
+        - name: servicePointId
+          in: query
+          description: >-
+            Defines the external unique identifier for a service point in
+            Siebel. This value is to be generated by the client systems while
+            creating a service point in Siebel.
+          schema:
+            example: 1-FZAZVFE
+            type: string
+            maxLength: 50
+        - name: country
+          in: query
+          description: Defines the country name.
+          schema:
+            example: US
+            type: string
+            maxLength: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/getGeographicAddressResponse'
+              example:
+                - id: A00000020172
+                  addressVerificationNeeded: false
+                  addressMatch: false
+                  uprn: '9051081968'
+                  addressSource: Openreach
+                  exchangeGroupCode: DEN
+                  districtCode: NS
+                  qualifier: Gold
+                  streetNr: '10'
+                  streetName: Correction Wynd
+                  postcode: AB10 1HP
+                  city: Aberdeen
+                  country: United Kingdom
+                  '@type': BtGeographicAddress
+                  geographicLocationRefOrValue:
+                    geometry:
+                      - x: '57.1473068'
+                        y: '-2.0988506'
+                  geographicSubAddress:
+                    - '@type': BtGeographicSubAddress
+                - id: A15102890726
+                  addressVerificationNeeded: false
+                  addressMatch: false
+                  uprn: '9051146360'
+                  parentUPRN: '9051081968'
+                  addressSource: Openreach
+                  exchangeGroupCode: DEN
+                  districtCode: NS
+                  qualifier: Gold
+                  streetNr: '10'
+                  streetName: Correction Wynd
+                  postcode: AB10 1HP
+                  city: Aberdeen
+                  country: United Kingdom
+                  '@type': BtGeographicAddress
+                  geographicLocationRefOrValue:
+                    geometry:
+                      - x: '57.1473068'
+                        y: '-2.0988506'
+                  geographicSubAddress:
+                    - subBuilding: First Floor Flat
+                      '@type': BtGeographicSubAddress
+        '400':
+          description: >-
+            Bad Request
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 25 | Missing header: \<parameter\> | The indicated parameter is
+            missing from the request header. | 
+
+            | 26 | Invalid header value: \<parameter\> | The indicated parameter
+            is invalid from the request header. | 
+
+            | 27 | Missing query-string parameter | The indicated parameter is missing from query-string. |
+
+            | 28 | Address key not supplied | The indicated parameter is missing
+            from query-string. |
+
+            | 29 | - | A general bad request error where we don't want to be any
+            more specific. | 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '25'
+                    message: 'Missing header: APIGW-Tracking-Header'
+                For back-end error:
+                  value:
+                    code: '28'
+                    reason: Invalid query-string parameter value
+                    message: Address key not supplied
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '401':
+          $ref: '#/components/responses/APIGWUnauthorized'
+        '403':
+          $ref: '#/components/responses/APIGWAccessDenied'
+        '404':
+          description: >-
+            Resource not found
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 60 | No matching address found. | The requested URI or the
+            requested resource does not exist.|
+             | 60 | SEARCH: No matching address found. | The requested URI or the
+            requested resource does not exist.|
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              example:
+                code: '60'
+                message: 'SEARCH: No matching address found.'
+                reason: Resource not found
+        '405':
+          $ref: '#/components/responses/APIGWMethodNotAllowed'
+        '500':
+          description: >-
+            Internal Server Error
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 01 | Internal Error / There was an error processing your request,
+            please try again later | BT error code / 'isSPA' custom attribute is
+            not set to "true" by SPA clients. |
+
+            | 02 | Internal Server Error | Generic failure message, used if no more precise code can
+            be provided. |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '01'
+                    message: Internal Error
+                For back-end error:
+                  value:
+                    code: '02'
+                    reason: Internal Server Error
+                    message: >-
+                      Error occured during web service processig
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '503':
+          description: >-
+            Service Unavailable
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 05 | The service is temporarily unavailable / There was an error
+            processing your request, please try again later | Please try again
+            later. | 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '05'
+                    message: The service is temporarily unavailable
+                For back-end error:
+                  value:
+                    code: '05'
+                    reason: The service is temporarily unavailable
+                    message: >-
+                      There was an error processing your request, please try
+                      again later
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+    post:
+      summary: Create address record
+      operationId: CreateGeographicAddress
+      description: >-
+
+        <p>For the RoBT address database only, Where a suitable matching address
+        is not found, an address can be created to obtain a temporary address
+        key.</p>
+
+       
+
+
+        <details>
+
+        <summary><b>Sandbox responses</b></summary>
+
+
+        <p>The sandbox supports a number of success and failure scenarios. Use
+        the parameters below in the sandbox API call to generate the
+        corresponding responses.</p>
+
+        <p>Success example responses are simulated based on the various inputs
+        like postcode, streetNr, country, city, buildingName, postalOrganisation
+        provided in the request payload as mentioned in the sample API
+        request.</p>
+
+        <p>Back-end error example responses are simulated based on
+        APIGW-Tracking-Header.</p>
+
+        <details>
+
+        <summary><b>Success scenarios</b></summary> 
+
+
+        | Combination of query parameters | Sandbox response invoked |
+        Description |
+
+        | ------------------------------- | ---------------- | ----------- |
+
+        | <I>postcode</I>='AB15 7XY', <I>streetNr</I>='23', <I>country</I>='uk',
+        <I>city</I>=London | 201 | Creates the address successfully based on
+        these inputs in payload. |
+
+        | <I>postcode</I>='AB10 1AU', <I>buildingName</I>='Odeon',
+        <I>country</I>='united kingdom', <I>city</I>=Bristol | 201 | Creates the
+        address successfully based on these inputs in payload. |
+
+        | <I>postcode</I>='NW11 1AG', <I>postalOrganisation</I>='PNC',
+        <I>country</I>='united kingdom', <I>city</I>=Hatfield | 201 | Creates
+        the address successfully based on these inputs in payload. |    
+
+
+        </details>
+
+
+        <details>
+
+        <summary><b>Error scenarios</b></summary>
+
+
+        | APIGW-Tracking-Header | Sandbox response invoked | Description | 
+
+        | ----------- | ------------ | ------------ |
+
+        | E00301 | 400, 29 | Bad request. |   
+
+        | E00101 | 500, 01 | Internal error. |
+
+        | E00201 | 503, 05 | The service is temporarily unavailable. |
+
+
+        </details>
+
+        </details>
+      x-codeSamples:
+        - lang: Shell
+          label: cURL
+          source: >
+            curl -XPOST
+
+            -H "APIGW-Tracking-Header: 96bb97fa-b941-46bb-8c4e-86c616c28a13"
+
+            -H "Authorization: Bearer 12gDpD0ai180mFjl3uPwiGLJRDjY"
+
+            -H "Content-Type: application/json"
+
+            -H "correlationId: 1234567872qw976"
+
+            -H "target: ROBT"
+
+            -H "btDuns: 221283316"
+
+            https://api-sandbox.wholesale.bt.com/common/geographicAddressManagement/v1/geographicAddress
+
+            {
+                "streetNr": "23",
+                "streetName": "HoopLane",
+                "postcode": "AB15 7XY",
+                "locality": "LONDON",
+                "city": "London",
+                "country": "UK",
+                "postalOrganisation": "PNC",
+                "poBox": "40",
+                "@type": "BtGeographicAddress",
+                "county": "123",
+                "geographicSubAddress": [
+                    {
+                        "buildingName": "Odeon",
+                        "subBuilding": "Flat1",
+                        "subStreet": "Stephens",
+                        "subLocality": "ShelleyAvenue",
+                        "@type": "BtGeographicSubAddress"
+                    }
+                ]
+            }
+      security:
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/APIGWTrackingHeader'
+        - $ref: '#/components/parameters/BearerAuthorisation'
+        - $ref: '#/components/parameters/JSONContentType'
+        - $ref: '#/components/parameters/correlationId'
+        - name: target
+          required: false
+          in: header
+          description: >-
+            Downstream component to be called by service. Sample values are
+            ROBT, Enterprise-ROBT, BTConsumer-ROBT, Openreach.
+          schema:
+            type: string
+            example: ROBT
+            maxLength: 500
+            pattern: ^[A-Za-z_-]*$
+        - name: btDuns
+          in: header
+          description: >-
+            Used as an identifier for LOB or component when calling Openreach
+            NAD. 
+          schema:
+            type: string
+            example: '221283316'
+            maxLength: 500
+            pattern: ^[0-9]*$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createGeographicAddressRequest'
+            examples:
+              For streetNr, city , country and postcode:
+                value:
+                  streetNr: 97a
+                  streetName: Nightingale Lane
+                  postcode: SW12 8NX
+                  locality: Balham
+                  city: London
+                  country: United Kingdom
+                  county: London
+                  '@type': BtGeographicAddress
+                  geographicSubAddress:
+                    - buildingName: The Nightingale
+                      subBuilding: First Floor
+                      '@type': BtGeographicSubAddress
+              For postalOrganisation, city, country and postcode:
+                value:
+                  streetName: SHEPHERD MARKET
+                  postcode: W1J 7QU
+                  city: LONDON
+                  country: United Kingdom
+                  county: MIDDLESEX
+                  postalOrganisation: JOSEPH AND DAUGTHERS LIMITED
+                  '@type': BtGeographicAddress
+              For buildingName, city, country and postcode:
+                value:
+                  streetName: Lesser Lane
+                  postcode: SK23 9UZ
+                  city: High Peak
+                  country: United Kingdom
+                  '@type': BtGeographicAddress
+                  geographicSubAddress:
+                    - buildingName: The Post House
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createGeographicAddressResponse'
+              example:
+                id: S14084134555
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createGeographicAddressResponse'
+              examples:
+                For streetNr, city , country and postcode:
+                  value:
+                    id: S14084134555
+                For postalOrganisation, city, country and postcode:
+                  value:
+                    id: X05000192647
+                For buildingName, city, country and postcode:
+                  value:
+                    id: X20154697825
+        '400':
+          description: >-
+            Bad Request
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 25 | Missing header: \<parameter\> | The indicated parameter is
+            missing from the request header. |
+
+            | 26 | Invalid header value: \<parameter\> | The indicated parameter
+            in the request header is not recognized. |
+
+            | 21 | Missing body | This resource requires a body to be provided
+            in the request. |
+
+            | 23 | Missing \<parameter\> | The indicated parameter is missing
+            from the body of the request. |
+
+            | 24 | Invalid \<parameter\> | The indicated parameter in the body
+            of the request is not recognised. |
+
+            | 29 | Bad Request | A general bad request error where we don't want
+            to be any more specific. |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '25'
+                    message: 'Missing header: APIGW-Tracking-Header'
+                For back-end error:
+                  value:
+                    code: '24'
+                    reason: Invalid body field
+                    message: Invalid Postcode
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '401':
+          $ref: '#/components/responses/APIGWUnauthorized'
+        '403':
+          $ref: '#/components/responses/APIGWAccessDenied'
+        '405':
+          $ref: '#/components/responses/APIGWMethodNotAllowed'
+        '500':
+          description: >-
+            Internal Server Error
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 01 | Internal Error / There was an error processing your request,
+            please try again later | BT error code / Generic failure message,
+            used if no more precise code can be provided. |
+
+            | 02 | Internal Server Error | Generic failure message, used if no more precise code can
+            be provided. |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '01'
+                    message: Internal Error
+                For back-end error:
+                  value:
+                    code: '02'
+                    reason: Internal Server Error
+                    message: >-
+                      There was an error processing your request, please try
+                      again later
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+        '503':
+          description: >-
+            Service Unavailable
+
+
+            | Code | Message | Description |
+
+            | ---- | ------- | ----------- |
+
+            | 05 | The service is temporarily unavailable / There was an error
+            processing your request, please try again later | Please try again
+            later. | 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+              examples:
+                For APIGW error:
+                  value:
+                    code: '05'
+                    message: The service is temporarily unavailable
+                For back-end error:
+                  value:
+                    code: '05'
+                    reason: The service is temporarily unavailable
+                    message: >-
+                      There was an error processing your request, please try
+                      again later
+          headers:
+            APIGW-Exception:
+              $ref: '#/components/headers/ExceptionOptional'
+            APIGW-Exception-Code:
+              $ref: '#/components/headers/ExceptionCodeOptional'
+            APIGW-Exception-System:
+              $ref: '#/components/headers/ExceptionSystemOptional'
+            Content-Type:
+              $ref: '#/components/headers/ContentTypeOptional'
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: This API requires [OAuth API](/node/360) validation.
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://api.platform.bt.com/oauth/accesstoken?grant_type=client_credentials
+          scopes: {}
+  parameters:
+    APIGWTrackingHeader:
+      name: APIGW-Tracking-Header
+      in: header
+      required: true
+      description: >-
+        A unique reference used to track the transaction end to end. The
+        recommended format is UUID (a 36-character alphanumeric string
+        "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX").
+      schema:
+        type: string
+        example: 96bb97fa-b941-46bb-8c4e-86c616c28a13
+        pattern: ^[\w.~:@-]{1,255}$
+    BearerAuthorisation:
+      name: Authorization
+      in: header
+      description: >-
+        This contains the access token obtained from a call to the OAuth API.
+        </br> The access token is prefixed with the word 'Bearer ' to form the
+        authorisation string.
+      schema:
+        example: Bearer <token>
+        type: string
+    correlationId:
+      name: correlationId
+      in: header
+      description: Represents a unique identifier (UUID) for the whole user journey
+      example: dd00abdd-2468-11ec-8b13-54ee75339701
+      required: false
+      schema:
+        type: string
+        example: 96bb97fa-b941-46bb-8c4e-86c616c28a13
+        pattern: >-
+          ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+    JSONContentType:
+      name: Content-Type
+      in: header
+      description: The only supported format for the request body is 'application/json'.
+      required: true
+      schema:
+        type: string
+        example: application/json
+  schemas:
+    geographicLocationRefOrValue:
+      type: object
+      description: Indicates the type of the geographic point reference.
+      properties:
+        geometry:
+          description: >-
+            A list of geographic points (GeographicPoint [*]). A GeographicPoint
+            defines a geographic point through coordinates.
+          type: array
+          items:
+            type: object
+            properties:
+              x:
+                type: string
+                description: x coordinate (usually latitude).
+                example: '1.430997'
+              'y':
+                type: string
+                description: y coordinate (usually longitude).
+                example: '43.597298'
+    geographicLocationRefOrValueArray:
+      type: array
+      description: Indicates the type of the geographic point reference.
+      items:
+        type: object
+        properties:
+          geometry:
+            description: >-
+              A list of geographic points (GeographicPoint [*]). A
+              GeographicPoint defines a geographic point through coordinates.
+            type: array
+            items:
+              type: object
+              properties:
+                x:
+                  type: string
+                  description: x coordinate (usually latitude).
+                  example: '1.430997'
+                'y':
+                  type: string
+                  description: y coordinate (usually longitude).
+                  example: '43.597298'
+          spatialRef:
+            description: >-
+              Geocoding referential. Possible values are 'WGS84', 'BNG'. This
+              field will be returned in the response, only when isSpatialRefBng
+              passed as true.
+            type: string
+            example: BNG
+    additionalAddressAttribute:
+      type: object
+      properties:
+        attributeType:
+          type: string
+          description: AttributeType
+          example: Location
+        listOfAttributeValues:
+          type: object
+          description: ListOfAttributeValues.
+          properties:
+            attributeValue:
+              type: array
+              maxItems: 50
+              description: AttributeValue.
+              example:
+                - Hot site
+                - Temporary
+                - Uninhabited
+              items:
+                description: AttributeValue
+                type: string
+                maxLength: 500
+                example: Hot site
+    getGeographicAddressResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 500
+          description: Unique identifier of the address.
+          example: '7513180'
+        addressVerificationNeeded:
+          type: boolean
+          description: Boolean value to identicate customer verification needed.
+          example: true
+        uprn:
+          type: string
+          description: Unique property reference number.
+          example: '9051030516'
+          maxLength: 500
+        parentUPRN:
+          type: string
+          description: Parent unique property reference number.
+          example: '9051030515'
+          pattern: ^[0-9a-zA-Z _]*$
+          maxLength: 500
+        addressSource:
+          type: string
+          description: Source received from downstream.
+          maxLength: 500
+          enum:
+            - ROBT
+            - Openreach
+        exchangeGroupCode:
+          type: string
+          description: Identifies the serving exchange for the address.
+          example: BRW
+          maxLength: 500
+        districtCode:
+          type: string
+          description: >-
+            A unique code representing the Openreach district (region) for the
+            address. Only returned for 'Gold' addresses.
+          example: EA
+          maxLength: 500
+        qualifier:
+          type: string
+          description: The address qualifier which indicates where the address was found.
+          maxLength: 500
+          enum:
+            - Gold
+            - Non-Gold
+            - Silver
+        streetNr:
+          type: string
+          description: Number identifying a specific property on a public street.
+          example: '5'
+          maxLength: 30
+        streetName:
+          type: string
+          maxLength: 100
+          description: Name of the street or other street type.
+          example: Hoop Lane
+        postcode:
+          type: string
+          description: >-
+            Descriptor for a postal delivery area, used to speed and simplify
+            the delivery of mail (also known as zipcode).
+          example: NW11 7NG
+          maxLength: 30
+        locality:
+          type: string
+          description: >-
+            An area of defined or undefined boundaries within a local authority
+            or other legislatively defined area, usually rural or semi-rural in
+            nature [ANZLIC-STREET], or a suburb a bounded locality within a
+            city, town or shire principally of urban character[ANZLICSTREET].
+          example: LONDON
+          maxLength: 100
+        city:
+          type: string
+          description: City that the address is in.
+          example: LONDON
+          maxLength: 60
+        country:
+          type: string
+          maxLength: 100
+          description: Country that the address is in.
+          example: UK
+        postalOrganisation:
+          maxLength: 100
+          type: string
+          description: Name of organization for postal deliveries.
+          example: PNC
+        poBox:
+          maxLength: 30
+          type: string
+          description: The post box number.
+          example: '40'
+        county:
+          description: >-
+            The counties of the United Kingdom are sub-national divisions of the
+            United Kingdom, used for the purposes of administrative,
+            geographical and political demarcation.
+          type: string
+          maxLength: 500
+          example: xyz
+        bestAddressLine1:
+          maxLength: 500
+          type: string
+          description: Address information as returned from PAF.
+          example: Flat 1 Rose Cottage
+        bestAddressLine2:
+          maxLength: 500
+          type: string
+          description: Address information as returned from PAF.
+          example: 22 Cheshunt High Street
+        bestAddressLine3:
+          maxLength: 500
+          type: string
+          description: Address information as returned from PAF.
+          example: Tyre Industrial Estate Blantyre
+        bestAddressLine4:
+          maxLength: 500
+          type: string
+          description: Address information as returned from PAF.
+          example: London NW11 7NG
+        '@type':
+          type: string
+          description: Indicates the type of the resource.
+          example: BtGeographicAddress
+          maxLength: 500
+          enum:
+            - BtGeographicSubAddress
+            - BtGeographicAddress
+        geographicLocationRefOrValue:
+          anyOf:
+            - $ref: '#/components/schemas/geographicLocationRefOrValue'
+            - $ref: '#/components/schemas/geographicLocationRefOrValueArray'
+        geographicSubAddress:
+          description: Indicates the type of the sub resource.
+          type: array
+          items:
+            type: object
+            properties:
+              buildingName:
+                maxLength: 150
+                type: string
+                description: >-
+                  Premise name. i.e. name of the building, particularly used
+                  where there is no street number. Allows for buildings that
+                  have well-known names.
+                example: Odeon
+              subBuilding:
+                type: string
+                description: >-
+                  An area within a building. The sub premise that will be
+                  available under the same premise.
+                example: Flat 1
+                maxLength: 100
+              subStreet:
+                type: string
+                description: >-
+                  It is necessary to store additional information as dependent
+                  thoroughfare/subStreet to uniquely identify each one, when a
+                  thoroughfare/street name exists more than once within a town.
+                example: Stephens
+                maxLength: 100
+              subLocality:
+                type: string
+                description: >-
+                  Supporting dependent locality name to uniquely identify a
+                  dependent locality.
+                example: Shelley Avenue
+                maxLength: 100
+              '@type':
+                type: string
+                description: Indicates the type of the sub resource.
+                example: BtGeographicSubAddress
+                maxLength: 500
+                enum:
+                  - BtGeographicSubAddress
+                  - BtGeographicAddress
+        siteReference:
+          description: >-
+            Address reference which contains site classification details,
+            technology markers and restrictions.
+          type: object
+          properties:
+            siteClassificationCode:
+              type: string
+              description: A code that describes the site classification of the address.
+              example: Odeon
+              maxLength: 500
+            siteClassification:
+              type: string
+              description: Description of the site classification code.
+              example: Flat 1
+              maxLength: 500
+            listOfTechnology:
+              type: object
+              description: Contains list of technologies.
+              properties:
+                technology:
+                  type: array
+                  maxItems: 50
+                  description: >-
+                    Defines whether the address has an association with the
+                    given technology infrastructure(s). The associations given
+                    will guide the CPs in their choice of address for the
+                    desired product or service.
+                  items:
+                    type: object
+                    properties:
+                      technologyName:
+                        type: string
+                        description: >-
+                          Name of the technology infrastructure. Possible values
+                          are 'Copper', 'PointToPointFibre', 'FTTPBrownfield',
+                          'FTTPGreenfield'.
+                        example: Copper
+                        maxLength: 500
+                      technologyValue:
+                        type: string
+                        description: >-
+                          Possible values are 'Y', 'N'. 'Y' indicates whether
+                          the address has an association with the given
+                          technology infrastructure(s) and 'N' indicates it’s
+                          absence.
+                        example: 'Y'
+            listOfTechnologyRestriction:
+              type: object
+              description: >-
+                Defines whether the address has a restriction with the given
+                technology infrastructure(s).
+              properties:
+                technologyRestriction:
+                  type: array
+                  maxItems: 50
+                  description: Contains technology restrictions.
+                  items:
+                    type: object
+                    properties:
+                      technologyRestrictionName:
+                        type: string
+                        description: >-
+                          Name of the restricted technology infrastructure.
+                          Possible values are 'Copper', 'PointToPointFibre',
+                          'FTTPBrownfield', 'FTTPGreenfield'.
+                        example: Copper
+                      technologyRestrictionValue:
+                        type: string
+                        description: >-
+                          Possible values are 'R', 'U'. 'R' indicates whether
+                          the address has a restriction with the given
+                          technology infrastructure(s) and 'U' indicates no
+                          restriction.
+                        example: R
+                        maxLength: 500
+        addressMatch:
+          type: boolean
+          description: >-
+            Indicates whether the Openreach address and ROBT address are
+            matched.
+          example: true
+        matchedId:
+          type: string
+          description: Matching NAD key.
+          example: X05000192647
+          maxLength: 500
+        ListOfAdditionalAddressAttributes:
+          type: object
+          description: ListOfAdditionalAddressAttributes
+          properties:
+            additionalAddressAttribute:
+              type: array
+              description: AdditionalAddressAttribute.
+              maxItems: 50
+              items:
+                $ref: '#/components/schemas/additionalAddressAttribute'
+    FailureResponse:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: >-
+            Application related code (as defined in the API or from a common
+            list).
+        reason:
+          type: string
+          description: Text that explains the reason for error.
+        message:
+          type: string
+          description: >-
+            Text that provides more details and corrective actions related to
+            the error.
+    failureResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Represents the error code.
+        message:
+          type: string
+          description: Represents the error message.
+    createGeographicAddressRequest:
+      type: object
+      properties:
+        streetNr:
+          type: string
+          maxLength: 30
+          description: Number identifying a specific property on a public street.
+          example: '5'
+        streetName:
+          type: string
+          description: Name of the street or other street type.
+          maxLength: 100
+          example: Hoop Lane
+        postcode:
+          type: string
+          description: >-
+            Descriptor for a postal delivery area, used to speed and simplify
+            the delivery of mail (also known as zipcode).
+          example: NW11 7NG
+          maxLength: 30
+        locality:
+          type: string
+          maxLength: 100
+          description: >-
+            An area of defined or undefined boundaries within a local authority
+            or other legislatively defined area, usually rural or semi-rural in
+            nature. [ANZLIC-STREET], or a suburb a bounded locality within a
+            city, town or shire principally of urban character [ANZLICSTREET].
+          example: LONDON
+        city:
+          type: string
+          description: City that the address is in.
+          maxLength: 60
+          example: LONDON
+        country:
+          type: string
+          maxLength: 100
+          description: Country that the address is in.
+          example: UK
+        postalOrganisation:
+          maxLength: 100
+          type: string
+          description: Name of organization for postal deliveries.
+          example: PNC
+        poBox:
+          maxLength: 30
+          type: string
+          description: The post box number.
+          example: '40'
+        county:
+          description: >-
+            The counties of the United Kingdom are subnational divisions of the
+            United Kingdom, used for the purposes of administrative,
+            geographical and political demarcation.
+          type: string
+          maxLength: 100
+          example: xyz
+        '@type':
+          type: string
+          description: Indicates the type of the resource.
+          example: BtGeographicAddress
+          maxLength: 500
+          enum:
+            - BtGeographicSubAddress
+            - BtGeographicAddress
+        geographicSubAddress:
+          description: Indicates the type of the sub resource.
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            properties:
+              buildingName:
+                maxLength: 150
+                type: string
+                description: >-
+                  Premise name. i.e. name of the building, particularly used
+                  where there is no street number. Allows for buildings that
+                  have well-known names.
+                example: Odeon
+              subBuilding:
+                type: string
+                description: >-
+                  An area within a building. The sub premise that will be
+                  available under the same premise.
+                example: Flat 1
+                maxLength: 100
+              subStreet:
+                type: string
+                description: >-
+                  It is necessary to store additional information as dependent
+                  thoroughfare/subStreet to uniquely identify each one, when
+                  thoroughfare/street name exists more than once within a town.
+                example: Stephens
+                maxLength: 100
+              subLocality:
+                type: string
+                description: >-
+                  Supporting dependent locality name to uniquely identify a
+                  dependent locality.
+                example: Shelley Avenue
+                maxLength: 100
+              '@type':
+                type: string
+                description: Indicates the type of the sub resource.
+                example: BtGeographicSubAddress
+                maxLength: 500
+    createGeographicAddressResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: X05000192647
+          description: NAD/Address key returned by RoBT NAD.
+  headers:
+    ExceptionOptional:
+      schema:
+        type: string
+      description: Header carrying the message of the exception.
+    ExceptionCodeOptional:
+      schema:
+        type: string
+      description: Header carrying the code of the exception.
+    ExceptionSystemOptional:
+      schema:
+        type: string
+      description: Header carrying the system from which the exception has originated.
+    ContentTypeOptional:
+      schema:
+        type: string
+      description: This indicates the format of the error response.
+    Exception:
+      schema:
+        type: string
+      description: Header carrying the message of the exception.
+      required: true
+    ExceptionCode:
+      schema:
+        type: string
+      description: Header carrying the code of the exception.
+      required: true
+    ExceptionSystem:
+      schema:
+        type: string
+      description: Header carrying the system from which the exception has originated.
+      required: true
+    ContentType:
+      schema:
+        type: string
+      description: This indicates the format of the error response.
+      required: true
+  responses:
+    APIGWUnauthorized:
+      description: >
+        Unauthorized
+
+
+        | Code | Message | Description |
+
+        | ---- | ------- | ----------- |
+
+        | 40 | Missing credentials | The <i>Authorization</i> parameter is
+        missing. |
+
+        | 41 | Invalid credentials | The <i>Authorization</i> parameter is not
+        valid. |
+
+        | 42 | Expired credentials | Renew the access token using the OAuth API
+        and try again. |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '41'
+            message: Invalid credentials
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'
+    APIGWAccessDenied:
+      description: >
+        Forbidden
+
+
+        | Code | Message | Description |
+
+        | ---- | ------- | ----------- |
+
+        | 50 | Access denied | The client application is not authorised to call
+        this resource. |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '50'
+            message: Access denied
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'
+    APIGWMethodNotAllowed:
+      description: >
+        Method Not Allowed
+
+
+        | Code | Message   | Description |
+
+        | ---- | -------   | ----------- |
+
+        | 61 | Method not allowed | The requested method is not supported by
+        this resource. |   
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failureResponse'
+          example:
+            code: '61'
+            message: Method not allowed
+      headers:
+        APIGW-Exception:
+          $ref: '#/components/headers/Exception'
+        APIGW-Exception-Code:
+          $ref: '#/components/headers/ExceptionCode'
+        APIGW-Exception-System:
+          $ref: '#/components/headers/ExceptionSystem'
+        Content-Type:
+          $ref: '#/components/headers/ContentType'
