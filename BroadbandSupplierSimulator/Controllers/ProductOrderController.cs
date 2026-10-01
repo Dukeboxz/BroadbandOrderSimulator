@@ -32,7 +32,7 @@ public class ProductOrderController : ControllerBase
     public IActionResult AmendProductOrder(
         string id,
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
-        [FromBody] AmendProductOrderRequest2 request)
+        [FromBody] AmendProductOrderRequest request)
     {
         return Accepted();
     }

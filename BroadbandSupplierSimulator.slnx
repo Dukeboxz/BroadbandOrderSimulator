@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="BroadbandSupplierSimulator.Data/BroadbandSupplierSimulator.Data.csproj" />
   <Project Path="BroadbandSupplierSimulator/BroadbandSupplierSimulator.csproj" />
   <Project Path="BroadbandSupplierSimulatorTestProject/BroadbandSupplierSimulatorTestProject.csproj" Id="eb0589b6-34d4-4651-b747-d3ccfcd3e33c" />
 </Solution>
