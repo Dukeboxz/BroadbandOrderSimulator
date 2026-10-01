@@ -43,3 +43,35 @@ The container listens on ports 8080 (HTTP) and 8081 (HTTPS).
 Requests missing a required header (such as `APIGW-Tracking-Header`) or required body fields get a `400` response. Valid requests get the success status from the spec with an empty body.
 
 
+## Simulating failures and delays
+
+Every endpoint has two settings, configured under `Simulation:Endpoints:<EndpointName>`:
+
+| Setting | Type | Default | Effect |
+|---|---|---|---|
+| `SendFailure` | bool | `false` | When `true`, the endpoint returns `500` with `{"code":"01","message":"Internal Error"}` |
+| `ResponseDelayMs` | int | `0` | Milliseconds to wait before responding (also applies before a failure) |
+
+Set them as environment variables using `__` as the separator, for example:
+
+```powershell
+$env:Simulation__Endpoints__CreateProductOrder__SendFailure = "true"
+$env:Simulation__Endpoints__CreateProductOrder__ResponseDelayMs = "1500"
+```
+
+They can also be set in `appsettings.json`, which lists every endpoint with its defaults. The settings apply before request validation, so they take effect even for invalid requests.
+
+| EndpointName | Route |
+|---|---|
+| `CreateProductOrder` | `POST .../productOrder` |
+| `ProductOrderNotification` | `POST .../productOrder/notification` |
+| `AmendProductOrder` | `PATCH .../productOrder/{id}` |
+| `CancelProductOrder` | `POST .../cancelProductOrder` |
+| `CancelProductOrderNotification` | `POST .../cancelProductOrder/notification` |
+| `GetProduct` | `GET /tmf/productInventory/v4/product` |
+| `SearchTimeSlot` | `POST .../searchTimeSlot` |
+| `CreateAppointment` | `POST .../appointment` |
+| `GetGeographicAddress` | `GET .../geographicAddress` |
+| `CreateGeographicAddress` | `POST .../geographicAddress` |
+| `CreateProductOfferingQualification` | `POST .../productOfferingQualification` |
+| `GetAddressLineAvailability` | `GET /v1/line-availability/line` |

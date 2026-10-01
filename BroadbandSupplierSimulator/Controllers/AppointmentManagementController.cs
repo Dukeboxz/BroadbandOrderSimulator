@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using BroadbandSupplierSimulator.Models.AppointmentManagement;
+using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BroadbandSupplierSimulator.Controllers;
@@ -9,6 +10,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 public class AppointmentManagementController : ControllerBase
 {
     [HttpPost("searchTimeSlot")]
+    [SimulatedEndpoint(nameof(SearchTimeSlot))]
     public IActionResult SearchTimeSlot(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "productFamily")][AllowedValues("Ethernet", "Broadband-One", "BB1Hub", "BBOne")] string productFamily,
@@ -18,6 +20,7 @@ public class AppointmentManagementController : ControllerBase
     }
 
     [HttpPost("appointment")]
+    [SimulatedEndpoint(nameof(CreateAppointment))]
     public IActionResult CreateAppointment(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "productFamily")][AllowedValues("Ethernet", "Broadband-One", "BB1Hub", "BBOne")] string productFamily,

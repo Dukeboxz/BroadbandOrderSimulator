@@ -3,6 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.Configure<BroadbandSupplierSimulator.Simulation.SimulationOptions>(builder.Configuration.GetSection(BroadbandSupplierSimulator.Simulation.SimulationOptions.SectionName));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

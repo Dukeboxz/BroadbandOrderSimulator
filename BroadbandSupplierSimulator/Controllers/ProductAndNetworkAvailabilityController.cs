@@ -1,4 +1,5 @@
 using BroadbandSupplierSimulator.Models.ProductAndNetworkAvailability;
+using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BroadbandSupplierSimulator.Controllers;
@@ -7,6 +8,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 public class ProductAndNetworkAvailabilityController : ControllerBase
 {
     [HttpPost("hubco/tmf/productOfferingQualification/v4/productOfferingQualification")]
+    [SimulatedEndpoint(nameof(CreateProductOfferingQualification))]
     public IActionResult CreateProductOfferingQualification(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromBody] ProductOfferingQualificationCreate request)
@@ -15,6 +17,7 @@ public class ProductAndNetworkAvailabilityController : ControllerBase
     }
 
     [HttpGet("v1/line-availability/line")]
+    [SimulatedEndpoint(nameof(GetAddressLineAvailability))]
     public IActionResult GetAddressLineAvailability(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "Authorization")] string authorization,

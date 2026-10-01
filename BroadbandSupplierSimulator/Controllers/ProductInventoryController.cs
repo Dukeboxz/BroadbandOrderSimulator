@@ -1,3 +1,4 @@
+using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BroadbandSupplierSimulator.Controllers;
@@ -7,6 +8,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 public class ProductInventoryController : ControllerBase
 {
     [HttpGet("product")]
+    [SimulatedEndpoint(nameof(GetProduct))]
     public IActionResult GetProduct(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "Accept")] string accept,

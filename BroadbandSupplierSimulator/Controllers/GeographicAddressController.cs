@@ -1,4 +1,5 @@
 using BroadbandSupplierSimulator.Models.GeographicAddress;
+using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BroadbandSupplierSimulator.Controllers;
@@ -8,6 +9,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 public class GeographicAddressController : ControllerBase
 {
     [HttpGet("geographicAddress")]
+    [SimulatedEndpoint(nameof(GetGeographicAddress))]
     public IActionResult GetGeographicAddress(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "correlationId")] string? correlationId,
@@ -37,6 +39,7 @@ public class GeographicAddressController : ControllerBase
     }
 
     [HttpPost("geographicAddress")]
+    [SimulatedEndpoint(nameof(CreateGeographicAddress))]
     public IActionResult CreateGeographicAddress(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "correlationId")] string? correlationId,

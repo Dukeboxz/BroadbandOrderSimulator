@@ -1,4 +1,5 @@
 using BroadbandSupplierSimulator.Models.ProductOrder;
+using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BroadbandSupplierSimulator.Controllers;
@@ -8,6 +9,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 public class ProductOrderController : ControllerBase
 {
     [HttpPost("productOrder")]
+    [SimulatedEndpoint(nameof(CreateProductOrder))]
     public IActionResult CreateProductOrder(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromBody] ProductOrderCreate request)
@@ -16,6 +18,7 @@ public class ProductOrderController : ControllerBase
     }
 
     [HttpPost("productOrder/notification")]
+    [SimulatedEndpoint(nameof(ProductOrderNotification))]
     public IActionResult ProductOrderNotification(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromHeader(Name = "apigw-client-id")] string clientId,
@@ -25,6 +28,7 @@ public class ProductOrderController : ControllerBase
     }
 
     [HttpPatch("productOrder/{id}")]
+    [SimulatedEndpoint(nameof(AmendProductOrder))]
     public IActionResult AmendProductOrder(
         string id,
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
@@ -34,6 +38,7 @@ public class ProductOrderController : ControllerBase
     }
 
     [HttpPost("cancelProductOrder")]
+    [SimulatedEndpoint(nameof(CancelProductOrder))]
     public IActionResult CancelProductOrder(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromBody] CancelProductOrderCreateRequest request)
@@ -42,6 +47,7 @@ public class ProductOrderController : ControllerBase
     }
 
     [HttpPost("cancelProductOrder/notification")]
+    [SimulatedEndpoint(nameof(CancelProductOrderNotification))]
     public IActionResult CancelProductOrderNotification(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromBody] CancelProductOrderNotificationRequest request)
