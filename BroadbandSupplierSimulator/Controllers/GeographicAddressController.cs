@@ -1,4 +1,5 @@
 using BroadbandSupplierSimulator.Models.GeographicAddress;
+using BroadbandSupplierSimulator.Services;
 using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 
 [ApiController]
 [Route("common/geographicAddressManagement/v1")]
-public class GeographicAddressController : ControllerBase
+public class GeographicAddressController(IGeographicAddressService geographicAddressService) : ControllerBase
 {
     [HttpGet("geographicAddress")]
     [SimulatedEndpoint(nameof(GetGeographicAddress))]
@@ -35,7 +36,7 @@ public class GeographicAddressController : ControllerBase
         [FromQuery] string? servicePointId,
         [FromQuery] string? country)
     {
-        return Ok();
+        return Ok(geographicAddressService.GetGeographicAddress());
     }
 
     [HttpPost("geographicAddress")]

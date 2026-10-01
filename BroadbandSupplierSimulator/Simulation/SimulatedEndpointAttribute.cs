@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 
 namespace BroadbandSupplierSimulator.Simulation;
 
@@ -9,23 +8,17 @@ public sealed class SimulatedEndpointAttribute(string endpointName) : Attribute,
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
-        var options = context.HttpContext.RequestServices.GetRequiredService<IOptionsMonitor<SimulationOptions>>().CurrentValue;
+        var helper = context.HttpContext.RequestServices.GetRequiredService<ISimulationHelper>();
 
-        if (options.Endpoints.TryGetValue(endpointName, out var settings))
+        await helper.DelayResponseAsync(endpointName, context.HttpContext.RequestAborted);
+
+        if (helper.GetSettings(endpointName).SendFailure)
         {
-            if (settings.ResponseDelayMs > 0)
+            context.Result = new ObjectResult(new { code = "01", message = "Internal Error" })
             {
-                await Task.Delay(settings.ResponseDelayMs, context.HttpContext.RequestAborted);
-            }
-
-            if (settings.SendFailure)
-            {
-                context.Result = new ObjectResult(new { code = "01", message = "Internal Error" })
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
-                return;
-            }
+                StatusCode = StatusCodes.Status500InternalServerError
+            };
+            return;
         }
 
         await next();

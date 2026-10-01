@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.Configure<BroadbandSupplierSimulator.Simulation.SimulationOptions>(builder.Configuration.GetSection(BroadbandSupplierSimulator.Simulation.SimulationOptions.SectionName));
+builder.Services.AddSingleton<BroadbandSupplierSimulator.Simulation.ISimulationHelper, BroadbandSupplierSimulator.Simulation.SimulationHelper>();
+builder.Services.AddSingleton<BroadbandSupplierSimulator.Services.IAppointmentService, BroadbandSupplierSimulator.Services.AppointmentService>();
+builder.Services.AddSingleton<BroadbandSupplierSimulator.Services.IGeographicAddressService, BroadbandSupplierSimulator.Services.GeographicAddressService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

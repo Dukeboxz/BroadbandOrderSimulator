@@ -12,4 +12,6 @@ public class EndpointSimulationSettings
     public bool SendFailure { get; set; }
 
     public int ResponseDelayMs { get; set; }
+
+    public bool AppointmentAvailable { get; set; } = true;
 }
