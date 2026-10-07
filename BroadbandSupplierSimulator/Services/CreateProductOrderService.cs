@@ -1,12 +1,15 @@
+using BroadbandSupplierSimulator.Data;
+using BroadbandSupplierSimulator.Jobs;
 using BroadbandSupplierSimulator.Mappers;
 using BroadbandSupplierSimulator.Models.ProductOrder;
 using BroadbandSupplierSimulator.Validation;
+using Hangfire;
 
 namespace BroadbandSupplierSimulator.Services;
 
-public class CreateProductOrderService(IOrderItemValidatorFactory validatorFactory, IProductOrderCreateMapper mapper) : ICreateProductOrderService
+public class CreateProductOrderService(IOrderItemValidatorFactory validatorFactory, IProductOrderCreateMapper mapper, IRepository<BroadbandSupplierSimulator.Data.Entities.ProductOrder> repository, IBackgroundJobClient backgroundJobClient) : ICreateProductOrderService
 {
-    public OrderValidationResult CreateProductOrder(ProductOrderCreate payload)
+    public async Task<OrderValidationResult> CreateProductOrder(ProductOrderCreate payload, CancellationToken cancellationToken = default)
     {
         var result = new OrderValidationResult();
 
@@ -18,6 +21,9 @@ public class CreateProductOrderService(IOrderItemValidatorFactory validatorFacto
         if (result.IsValid)
         {
             var eventPayload = mapper.MapToProductOrderCreateEvent(payload);
+            var entity = ProductOrderMapper.ToEntity(eventPayload.ProductOrder!);
+            await repository.AddAsync(entity, cancellationToken);
+            backgroundJobClient.Enqueue<IProcessProductOrderJob>(job => job.ProcessAsync(entity.Id, CancellationToken.None));
         }
 
         return result;

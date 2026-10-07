@@ -5,5 +5,5 @@ namespace BroadbandSupplierSimulator.Services;
 
 public interface ICreateProductOrderService
 {
-    OrderValidationResult CreateProductOrder(ProductOrderCreate payload);
+    Task<OrderValidationResult> CreateProductOrder(ProductOrderCreate payload, CancellationToken cancellationToken = default);
 }

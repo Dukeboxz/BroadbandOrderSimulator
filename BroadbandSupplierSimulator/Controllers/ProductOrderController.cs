@@ -11,11 +11,12 @@ public class ProductOrderController(ICreateProductOrderService createProductOrde
 {
     [HttpPost("productOrder")]
     [SimulatedEndpoint(nameof(CreateProductOrder))]
-    public IActionResult CreateProductOrder(
+    public async Task<IActionResult> CreateProductOrder(
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
-        [FromBody] ProductOrderCreate request)
+        [FromBody] ProductOrderCreate request,
+        CancellationToken cancellationToken)
     {
-        var result = createProductOrderService.CreateProductOrder(request);
+        var result = await createProductOrderService.CreateProductOrder(request, cancellationToken);
 
         if (!result.IsValid)
         {
