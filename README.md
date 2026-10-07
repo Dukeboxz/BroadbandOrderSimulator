@@ -75,3 +75,15 @@ They can also be set in `appsettings.json`, which lists every endpoint with its 
 | `CreateGeographicAddress` | `POST .../geographicAddress` |
 | `CreateProductOfferingQualification` | `POST .../productOfferingQualification` |
 | `GetAddressLineAvailability` | `GET /v1/line-availability/line` |
+
+## Database connection
+
+The Postgres connection string is not stored in the repository. It is read from the `ConnectionStrings:Hobby` setting.
+
+For local development, store it as a user secret:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:Hobby" "Host=localhost;Port=5432;Database=hobby;Username=postgres;Password=<password>" --project BroadbandSupplierSimulator
+```
+
+In any other environment, set the `ConnectionStrings__Hobby` environment variable. The app fails at startup if the setting is missing. The same secret is used by the design-time factory when running `dotnet ef` commands.

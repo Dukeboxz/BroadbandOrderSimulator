@@ -1,4 +1,5 @@
 using BroadbandSupplierSimulator.Models.ProductOrder;
+using BroadbandSupplierSimulator.Services;
 using BroadbandSupplierSimulator.Simulation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace BroadbandSupplierSimulator.Controllers;
 
 [ApiController]
 [Route("hubco/tmf/productOrderingManagement/v4")]
-public class ProductOrderController : ControllerBase
+public class ProductOrderController(ICreateProductOrderService createProductOrderService) : ControllerBase
 {
     [HttpPost("productOrder")]
     [SimulatedEndpoint(nameof(CreateProductOrder))]
@@ -14,6 +15,18 @@ public class ProductOrderController : ControllerBase
         [FromHeader(Name = "APIGW-Tracking-Header")] string trackingHeader,
         [FromBody] ProductOrderCreate request)
     {
+        var result = createProductOrderService.CreateProductOrder(request);
+
+        if (!result.IsValid)
+        {
+            return BadRequest(new BackendFailureResponse
+            {
+                Code = "23",
+                Message = "Missing body field",
+                Reason = string.Join(" ", result.Errors)
+            });
+        }
+
         return Accepted();
     }
 
