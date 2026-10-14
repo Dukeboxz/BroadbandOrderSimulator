@@ -22,6 +22,7 @@ builder.Services.AddHangfire(config => config
     .UseRecommendedSerializerSettings()
     .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
 builder.Services.AddHangfireServer();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IProcessProductOrderJob, ProcessProductOrderJob>();
 builder.Services.AddSingleton<IOrderItemValidator, AddOrderItemValidator>();
 builder.Services.AddSingleton<IOrderItemValidator, ModifyOrderItemValidator>();

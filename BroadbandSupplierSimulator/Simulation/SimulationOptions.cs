@@ -4,6 +4,12 @@ public class SimulationOptions
 {
     public const string SectionName = "Simulation";
 
+    public string StageReturnFailure { get; set; } = string.Empty;
+
+    public int MessageGapMs { get; set; }
+
+    public string SendUrl { get; set; } = string.Empty;
+
     public Dictionary<string, EndpointSimulationSettings> Endpoints { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }
 
