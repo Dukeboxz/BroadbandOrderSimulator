@@ -6,6 +6,12 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
+# Stage at which items are failed by the simulator (e.g. InProgress, AwaitingECCConfirmation); empty disables failure
+ENV Simulation__StageReturnFailure=""
+# Delay in milliseconds between simulated messages
+ENV Simulation__MessageGapMs=0
+# URL the simulator POSTs simulated product order messages to
+ENV Simulation__SendUrl=""
 
 
 # This stage is used to build the service project

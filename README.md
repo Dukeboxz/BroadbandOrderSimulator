@@ -76,6 +76,39 @@ They can also be set in `appsettings.json`, which lists every endpoint with its 
 | `CreateProductOfferingQualification` | `POST .../productOfferingQualification` |
 | `GetAddressLineAvailability` | `GET /v1/line-availability/line` |
 
+## Order progression messages
+
+After a product order is created, a background (Hangfire) job simulates the supplier working through the order. Each run moves every item that is not yet in a terminal state (`Completed`, `Rejected`, `Failed`, `Cancelled`) one step forward, saves the change and POSTs a product order event to `SendUrl`. The job then schedules itself again after `MessageGapMs`, and stops once every item is terminal.
+
+An item progresses as follows:
+
+| Step | State | Sub status |
+|---|---|---|
+| 1 | `Acknowledged` | |
+| 2 | `InProgress` | `AcceptedByBTWwBC` |
+| 3 | `InProgress` | `AwaitingECCConfirmation` |
+| 4 | `InProgress` | `CommittedByBTWwBC` |
+| 5 | `InProgress` | `CompletedBTWwBCService` |
+| 6 | `Completed` | |
+
+These top-level settings are under `Simulation` and are set as environment variables using `__` as the separator:
+
+| Environment variable | Type | Default | Effect |
+|---|---|---|---|
+| `Simulation__SendUrl` | string | empty | URL the simulator POSTs each simulated message to. If empty, the progression still runs but no message is sent (a warning is logged) |
+| `Simulation__MessageGapMs` | int | `0` | Milliseconds to wait between one message and the next. Negative values are treated as `0` |
+| `Simulation__StageReturnFailure` | string | empty | Name of a stage at which items fail. When an item reaches a state or sub status matching this value (case-insensitive), its state is set to `Failed` and the failed message is sent. Empty disables failures |
+
+`Simulation__StageReturnFailure` can be any state name (`Acknowledged`, `InProgress`, `Completed`) or any sub status in the table above, for example:
+
+```powershell
+$env:Simulation__SendUrl = "http://localhost:5000/hubco/tmf/productOrderingManagement/v4/productOrder/notification"
+$env:Simulation__MessageGapMs = "2000"
+$env:Simulation__StageReturnFailure = "CommittedByBTWwBC"
+```
+
+With the Docker image, pass them with `-e`, for example `docker run -e Simulation__SendUrl=http://host/notify -e Simulation__MessageGapMs=2000 ...`. The Dockerfile defaults all three to empty or `0`.
+
 ## Database connection
 
 The Postgres connection string is not stored in the repository. It is read from the `ConnectionStrings:Hobby` setting.
