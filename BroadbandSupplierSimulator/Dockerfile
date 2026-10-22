@@ -19,6 +19,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["BroadbandSupplierSimulator/BroadbandSupplierSimulator.csproj", "BroadbandSupplierSimulator/"]
+COPY ["BroadbandSupplierSimulator.Data/BroadbandSupplierSimulator.Data.csproj", "BroadbandSupplierSimulator.Data/"]
 RUN dotnet restore "./BroadbandSupplierSimulator/BroadbandSupplierSimulator.csproj"
 COPY . .
 WORKDIR "/src/BroadbandSupplierSimulator"

@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: hobby
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hobby"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: BroadbandSupplierSimulator/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Hobby: Host=db;Port=5432;Database=hobby;Username=postgres;Password=${POSTGRES_PASSWORD:-postgres}
+      Database__MigrateOnStartup: "true"
+      Simulation__StageReturnFailure: ${SIMULATION_STAGE_RETURN_FAILURE:-}
+      Simulation__MessageGapMs: ${SIMULATION_MESSAGE_GAP_MS:-0}
+      Simulation__SendUrl: ${SIMULATION_SEND_URL:-}
+
+volumes:
+  pgdata:

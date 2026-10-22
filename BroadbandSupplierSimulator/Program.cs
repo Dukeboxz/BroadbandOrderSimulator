@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using BroadbandSupplierSimulator.Data;
 using BroadbandSupplierSimulator.Jobs;
 using Hangfire;
@@ -36,6 +37,11 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+if (app.Configuration.GetValue("Database:MigrateOnStartup", true))
+{
+    await MigrateDatabaseAsync(app);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -50,3 +56,24 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task MigrateDatabaseAsync(WebApplication app)
+{
+    const int maxAttempts = 10;
+
+    for (var attempt = 1; ; attempt++)
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<SimulatorDbContext>();
+            await db.Database.MigrateAsync();
+            return;
+        }
+        catch (Exception ex) when (attempt < maxAttempts)
+        {
+            app.Logger.LogWarning(ex, "Database migration attempt {Attempt}/{Max} failed; retrying", attempt, maxAttempts);
+            await Task.Delay(TimeSpan.FromSeconds(3));
+        }
+    }
+}

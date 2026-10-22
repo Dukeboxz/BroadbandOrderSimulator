@@ -23,6 +23,19 @@ docker build -f BroadbandSupplierSimulator/Dockerfile -t broadband-supplier-simu
 
 The container listens on ports 8080 (HTTP) and 8081 (HTTPS).
 
+#### Docker Compose (app + database)
+
+To start the API together with a linked Postgres container:
+
+```powershell
+docker compose up --build
+```
+
+- The API is at `http://localhost:8080` (Development environment, so `/openapi/v1.json` and the Hangfire dashboard at `/hangfire` are available).
+- Postgres is published on `localhost:5432` (database `hobby`, user `postgres`) and persisted in the `pgdata` volume. `docker compose down -v` wipes it.
+- The password defaults to `postgres`; override it with `POSTGRES_PASSWORD` in a `.env` file or the environment. `SIMULATION_SEND_URL`, `SIMULATION_MESSAGE_GAP_MS` and `SIMULATION_STAGE_RETURN_FAILURE` set the simulation options.
+- EF Core migrations are applied automatically when the app starts (retrying while the database comes up). Set `Database__MigrateOnStartup=false` to disable this.
+
 ## Endpoints
 
 | Controller | Method and route |
