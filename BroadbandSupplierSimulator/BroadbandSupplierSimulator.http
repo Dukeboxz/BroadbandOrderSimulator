@@ -1,6 +1,39 @@
 @BroadbandSupplierSimulator_HostAddress = http://localhost:5135
+# Docker (docker compose up --build) listens on http://localhost:8080 instead.
 
-GET {{BroadbandSupplierSimulator_HostAddress}}/weatherforecast/
-Accept: application/json
+### Create product order (valid) - expect 202 Accepted
+POST {{BroadbandSupplierSimulator_HostAddress}}/hubco/tmf/productOrderingManagement/v4/productOrder
+APIGW-Tracking-Header: test-123
+Content-Type: application/json
+
+{
+  "externalId": "EXT-1",
+  "description": "test order",
+  "productOrderItem": [
+    {
+      "id": "1",
+      "action": "add",
+      "product": {
+        "productCharacteristic": [
+          { "name": "speed", "value": "80" }
+        ]
+      }
+    }
+  ]
+}
+
+### Create product order (invalid: add item without productCharacteristic) - expect 400 Bad Request
+POST {{BroadbandSupplierSimulator_HostAddress}}/hubco/tmf/productOrderingManagement/v4/productOrder
+APIGW-Tracking-Header: test-123
+Content-Type: application/json
+
+{
+  "productOrderItem": [
+    {
+      "id": "1",
+      "action": "add"
+    }
+  ]
+}
 
 ###
