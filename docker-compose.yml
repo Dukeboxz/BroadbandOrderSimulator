@@ -31,7 +31,7 @@ services:
       Database__MigrateOnStartup: "true"
       Simulation__StageReturnFailure: ${SIMULATION_STAGE_RETURN_FAILURE:-}
       Simulation__MessageGapMs: ${SIMULATION_MESSAGE_GAP_MS:-0}
-      Simulation__SendUrl: ${SIMULATION_SEND_URL:-}
+      Simulation__SendUrl: ${SIMULATION_SEND_URL:-http://localhost:8080/outputTest}
 
 volumes:
   pgdata:

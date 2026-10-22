@@ -108,7 +108,7 @@ These top-level settings are under `Simulation` and are set as environment varia
 
 | Environment variable | Type | Default | Effect |
 |---|---|---|---|
-| `Simulation__SendUrl` | string | empty | URL the simulator POSTs each simulated message to. If empty, the progression still runs but no message is sent (a warning is logged) |
+| `Simulation__SendUrl` | string | `http://localhost:5135/outputTest` (`http://localhost:8080/outputTest` in Docker) | URL the simulator POSTs each simulated message to. The default is the simulator's own `outputTest` endpoint, which prints the event to the console. If empty, the progression still runs but no message is sent (a warning is logged) |
 | `Simulation__MessageGapMs` | int | `0` | Milliseconds to wait between one message and the next. Negative values are treated as `0` |
 | `Simulation__StageReturnFailure` | string | empty | Name of a stage at which items fail. When an item reaches a state or sub status matching this value (case-insensitive), its state is set to `Failed` and the failed message is sent. Empty disables failures |
 
@@ -120,7 +120,7 @@ $env:Simulation__MessageGapMs = "2000"
 $env:Simulation__StageReturnFailure = "CommittedByBTWwBC"
 ```
 
-With the Docker image, pass them with `-e`, for example `docker run -e Simulation__SendUrl=http://host/notify -e Simulation__MessageGapMs=2000 ...`. The Dockerfile defaults all three to empty or `0`.
+With the Docker image, pass them with `-e`, for example `docker run -e Simulation__SendUrl=http://host/notify -e Simulation__MessageGapMs=2000 ...`. The Dockerfile defaults `SendUrl` to its own `outputTest` endpoint and the other two to empty or `0`.
 
 ## Database connection
 

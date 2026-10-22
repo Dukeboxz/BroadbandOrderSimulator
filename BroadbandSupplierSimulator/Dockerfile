@@ -11,7 +11,7 @@ ENV Simulation__StageReturnFailure=""
 # Delay in milliseconds between simulated messages
 ENV Simulation__MessageGapMs=0
 # URL the simulator POSTs simulated product order messages to
-ENV Simulation__SendUrl=""
+ENV Simulation__SendUrl="http://localhost:8080/outputTest"
 
 
 # This stage is used to build the service project
