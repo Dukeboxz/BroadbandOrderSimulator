@@ -200,6 +200,76 @@ public class ProcessProductOrderJobTests
         Assert.Single(h.Jobs.Created);
     }
 
+    private static SimulationOptions WithOrder(params MessageStage[] stages) =>
+        new() { SendUrl = Url, MessageOrder = [.. stages] };
+
+    private static readonly MessageStage[] CustomOrder =
+    [
+        new() { SequenceOrder = 10, State = ProductOrderItemState.Pending },
+        new() { SequenceOrder = 20, State = ProductOrderItemState.InProgress, SubStatus = MessageSubStatus.AcceptedByBTWwBC },
+        new() { SequenceOrder = 30, State = ProductOrderItemState.InProgress, SubStatus = MessageSubStatus.CancellationRequest }
+    ];
+
+    [Fact]
+    public async Task MessageOrder_NullState_MovesToFirstStage()
+    {
+        var h = Create(Order(Item("1")), WithOrder(CustomOrder));
+
+        await h.RunAsync();
+
+        Assert.Equal(ProductOrderItemState.Pending, h.Order.Items[0].State);
+        Assert.Null(h.Order.Items[0].SubStatus);
+    }
+
+    [Theory]
+    [InlineData(ProductOrderItemState.Pending, null, ProductOrderItemState.InProgress, "AcceptedByBTWwBC")]
+    [InlineData(ProductOrderItemState.InProgress, "AcceptedByBTWwBC", ProductOrderItemState.InProgress, "Cancellation Request")]
+    [InlineData(ProductOrderItemState.InProgress, "acceptedbybtwwbc", ProductOrderItemState.InProgress, "Cancellation Request")]
+    [InlineData(ProductOrderItemState.InProgress, "Cancellation Request", ProductOrderItemState.Completed, "Cancellation Request")]
+    public async Task MessageOrder_MatchingStage_MovesToNextOrCompleted(
+        ProductOrderItemState state, string? subStatus, ProductOrderItemState expectedState, string? expectedSubStatus)
+    {
+        var h = Create(Order(Item("1", state, subStatus)), WithOrder(CustomOrder));
+
+        await h.RunAsync();
+
+        Assert.Equal(expectedState, h.Order.Items[0].State);
+        Assert.Equal(expectedSubStatus, h.Order.Items[0].SubStatus);
+    }
+
+    [Fact]
+    public async Task MessageOrder_UsesSequenceOrderNotListPosition()
+    {
+        var h = Create(Order(Item("1")), WithOrder(CustomOrder.Reverse().ToArray()));
+
+        await h.RunAsync();
+        Assert.Equal(ProductOrderItemState.Pending, h.Order.Items[0].State);
+
+        await h.RunAsync();
+        Assert.Equal("AcceptedByBTWwBC", h.Order.Items[0].SubStatus);
+    }
+
+    [Fact]
+    public async Task MessageOrder_UnmatchedStage_MovesToCompleted()
+    {
+        var h = Create(Order(Item("1", ProductOrderItemState.Held)), WithOrder(CustomOrder));
+
+        await h.RunAsync();
+
+        Assert.Equal(ProductOrderItemState.Completed, h.Order.Items[0].State);
+    }
+
+    [Fact]
+    public async Task MessageOrder_Null_UsesDefaultProgression()
+    {
+        var h = Create(Order(Item("1", ProductOrderItemState.Acknowledged)), new SimulationOptions { SendUrl = Url, MessageOrder = null });
+
+        await h.RunAsync();
+
+        Assert.Equal(ProductOrderItemState.InProgress, h.Order.Items[0].State);
+        Assert.Equal("AcceptedByBTWwBC", h.Order.Items[0].SubStatus);
+    }
+
     [Fact]
     public async Task FailedSend_Throws_AndDoesNotReschedule()
     {

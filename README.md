@@ -109,10 +109,21 @@ These top-level settings are under `Simulation` and are set as environment varia
 | Environment variable | Type | Default | Effect |
 |---|---|---|---|
 | `Simulation__SendUrl` | string | `http://localhost:5135/outputTest` (`http://localhost:8080/outputTest` in Docker) | URL the simulator POSTs each simulated message to. The default is the simulator's own `outputTest` endpoint, which prints the event to the console. If empty, the progression still runs but no message is sent (a warning is logged) |
+| `Simulation__MessageOrder` | list of `{ SequenceOrder, State, SubStatus }` | not set | Custom progression. When set, replaces the default steps above: the item's current state and sub status are looked up in the list (sub status compared case-insensitively, empty equals null) and the item moves to the entry with the next higher `SequenceOrder`. A new item (no state yet) moves to the entry with the lowest `SequenceOrder`; after the highest, or if the current state and sub status are not in the list, it moves to `Completed`. Not set keeps the default progression |
 | `Simulation__MessageGapMs` | int | `0` | Milliseconds to wait between one message and the next. Negative values are treated as `0` |
 | `Simulation__StageReturnFailure` | string | empty | Name of a stage at which items fail. When an item reaches a state or sub status matching this value (case-insensitive), its state is set to `Failed` and the failed message is sent. Empty disables failures |
 
 `Simulation__StageReturnFailure` can be any state name (`Acknowledged`, `InProgress`, `Completed`) or any sub status in the table above, for example:
+
+Example `MessageOrder` (environment variables, the number in the name is only the list position, ordering uses `SequenceOrder`; `appsettings.json` uses a normal JSON array). `SubStatus` is one of the `MessageSubStatus` names (for example `AwaitingECCConfirmation`, `AcceptedByBTWwBC`, `CancellationRequest`, `InProgressWithSpace`) and is optional:
+
+```powershell
+$env:Simulation__MessageOrder__0__SequenceOrder = "1"
+$env:Simulation__MessageOrder__0__State = "Acknowledged"
+$env:Simulation__MessageOrder__1__SequenceOrder = "2"
+$env:Simulation__MessageOrder__1__State = "InProgress"
+$env:Simulation__MessageOrder__1__SubStatus = "CommittedByBTWwBC"
+```
 
 ```powershell
 $env:Simulation__SendUrl = "http://localhost:5000/hubco/tmf/productOrderingManagement/v4/productOrder/notification"

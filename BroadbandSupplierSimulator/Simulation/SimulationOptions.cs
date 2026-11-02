@@ -1,3 +1,5 @@
+using BroadbandSupplierSimulator.Data.Entities;
+
 namespace BroadbandSupplierSimulator.Simulation;
 
 public class SimulationOptions
@@ -9,6 +11,8 @@ public class SimulationOptions
     public int MessageGapMs { get; set; }
 
     public string SendUrl { get; set; } = string.Empty;
+
+    public List<MessageStage>? MessageOrder { get; set; }
 
     public Dictionary<string, EndpointSimulationSettings> Endpoints { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }

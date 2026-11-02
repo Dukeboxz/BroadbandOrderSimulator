@@ -53,7 +53,7 @@ public class ProcessProductOrderJob(
 
         foreach (var item in productOrder.Items.Where(i => !IsTerminal(i)))
         {
-            Advance(item);
+            Advance(item, options.CurrentValue.MessageOrder);
 
             if (MatchesStage(item, failureStage))
             {
@@ -105,8 +105,14 @@ public class ProcessProductOrderJob(
             || string.Equals(item.SubStatus, stage, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void Advance(ProductOrderItem item)
+    private void Advance(ProductOrderItem item, List<MessageStage>? messageOrder)
     {
+        if (messageOrder is not null)
+        {
+            AdvanceThroughMessageOrder(item, messageOrder);
+            return;
+        }
+
         switch (item.State)
         {
             case null:
@@ -133,4 +139,38 @@ public class ProcessProductOrderJob(
                 break;
         }
     }
+
+    private void AdvanceThroughMessageOrder(ProductOrderItem item, List<MessageStage> messageOrder)
+    {
+        var ordered = messageOrder.OrderBy(s => s.SequenceOrder).ToList();
+        MessageStage? next;
+
+        if (item.State is null)
+        {
+            next = ordered.FirstOrDefault();
+        }
+        else
+        {
+            var current = ordered.FirstOrDefault(s => s.State == item.State
+                && string.Equals(NullIfEmpty(s.SubStatus?.ToValue()), NullIfEmpty(item.SubStatus), StringComparison.OrdinalIgnoreCase));
+
+            if (current is null)
+            {
+                logger.LogWarning("Item {ItemId} in state {State}/{SubStatus} is not in MessageOrder; moving to Completed", item.ItemId, item.State, item.SubStatus);
+            }
+
+            next = current is null ? null : ordered.FirstOrDefault(s => s.SequenceOrder > current.SequenceOrder);
+        }
+
+        if (next is null)
+        {
+            item.State = ProductOrderItemState.Completed;
+            return;
+        }
+
+        item.State = next.State;
+        item.SubStatus = next.SubStatus?.ToValue();
+    }
+
+    private static string? NullIfEmpty(string? value) => string.IsNullOrEmpty(value) ? null : value;
 }
