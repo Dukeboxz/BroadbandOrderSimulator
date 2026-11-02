@@ -133,6 +133,35 @@ $env:Simulation__StageReturnFailure = "CommittedByBTWwBC"
 
 With the Docker image, pass them with `-e`, for example `docker run -e Simulation__SendUrl=http://host/notify -e Simulation__MessageGapMs=2000 ...`. The Dockerfile defaults `SendUrl` to its own `outputTest` endpoint and the other two to empty or `0`.
 
+## Changing simulation settings at runtime
+
+`POST /simulatorOptions/SetOptions` updates the `Simulation` settings while the app is running. The body has the same fields as the settings above, all optional; only the fields present are changed, everything else keeps its current value. The response is `200` with the full settings now in effect, or `400` with `{ "errors": [...] }` if any value is invalid (nothing is changed in that case).
+
+```json
+{
+  "MessageGapMs": 2000,
+  "StageReturnFailure": "CommittedByBTWwBC",
+  "MessageOrder": [
+    { "SequenceOrder": 1, "State": "Acknowledged" },
+    { "SequenceOrder": 2, "State": "InProgress", "SubStatus": "AwaitingECCConfirmation" }
+  ],
+  "Endpoints": {
+    "CreateProductOrder": { "SendFailure": true },
+    "SearchTimeSlot": { "ResponseDelayMs": 1500, "AppointmentAvailable": false }
+  }
+}
+```
+
+Validation rules:
+
+- `StageReturnFailure` must be empty or a known state or sub status name.
+- `MessageGapMs` and `ResponseDelayMs` must be `0` or greater.
+- `SendUrl` must be empty (disables sending) or an absolute `http`/`https` URL.
+- `MessageOrder` replaces the whole list. Each entry needs a `SequenceOrder` (unique) and a `State`; `SubStatus` is optional. Both are sent as text: `State` is a state name (`Acknowledged`, `InProgress`, ...) and `SubStatus` a `MessageSubStatus` name (`AwaitingECCConfirmation`, ...), case-insensitive. An unrecognised name is rejected with a standard `400` validation problem response naming the field. An empty list `[]` clears it, restoring the default progression.
+- `Endpoints` keys must be one of the endpoint names in the table above (case-insensitive). Only the fields given for an endpoint change. `AppointmentAvailable` is only accepted for `SearchTimeSlot`.
+
+Changes are held in memory: they survive edits to `appsettings.json` but are lost when the app restarts.
+
 ## Database connection
 
 The Postgres connection string is not stored in the repository. It is read from the `ConnectionStrings:Hobby` setting.

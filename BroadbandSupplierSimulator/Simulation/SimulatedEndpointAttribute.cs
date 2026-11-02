@@ -6,6 +6,8 @@ namespace BroadbandSupplierSimulator.Simulation;
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class SimulatedEndpointAttribute(string endpointName) : Attribute, IAsyncResourceFilter
 {
+    public string EndpointName { get; } = endpointName;
+
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         var helper = context.HttpContext.RequestServices.GetRequiredService<ISimulationHelper>();

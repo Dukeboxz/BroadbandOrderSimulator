@@ -37,3 +37,29 @@ Content-Type: application/json
 }
 
 ###
+
+### Set simulation options (partial update) - expect 200 OK with the settings now in effect
+POST {{BroadbandSupplierSimulator_HostAddress}}/simulatorOptions/SetOptions
+Content-Type: application/json
+
+{
+  "messageGapMs": 2000,
+  "stageReturnFailure": "CommittedByBTWwBC",
+  "endpoints": {
+    "CreateProductOrder": { "sendFailure": true, "responseDelayMs": 500 }
+  }
+}
+
+### Set simulation options (invalid values) - expect 400 Bad Request
+POST {{BroadbandSupplierSimulator_HostAddress}}/simulatorOptions/SetOptions
+Content-Type: application/json
+
+{
+  "messageGapMs": -1,
+  "sendUrl": "not a url",
+  "endpoints": {
+    "UnknownEndpoint": { "sendFailure": true }
+  }
+}
+
+###

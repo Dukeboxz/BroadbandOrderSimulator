@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace BroadbandSupplierSimulator.Simulation;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MessageSubStatus
 {
     Acknowledged,
